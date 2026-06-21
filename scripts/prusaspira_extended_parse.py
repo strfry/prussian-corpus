@@ -22,7 +22,7 @@ import sys
 from bs4 import BeautifulSoup
 
 from prusaspira_parse import (
-    _adj_columns,
+    _cell_text,
     _parse_adj_declension,
 )
 
@@ -36,6 +36,12 @@ STRING_TYPES = {"cp", "sp", "pcps", "pcptac", "pcptpa"}
 
 TYPE_TO_FIELD = {"cp": "comparative", "sp": "superlative"}
 PARTICIPLE_TYPE_MAP = {"pcps": "Present", "pcptac": "Past", "pcptpa": "Passive"}
+
+# Filename format: {form}_{paradigm}_{type}.html
+FILENAME_RE = re.compile(r'^(.+)_(\d+[a-z]*)_(cp|sp|pcps|pcptac|pcptpa)\.html$')
+
+# Lemma from HTML header: <b>FORM</b> - ... : <b>LEMMA</b>
+LEMMA_RE = re.compile(r'<b>[^<]+</b>\s*-[^:]*:\s*<b>([^<]+)</b>')
 
 
 def load_json(path):
@@ -61,7 +67,7 @@ def build_lemma_map():
     """Scan letter files for all ens_str() calls.
 
     Returns {filename: {form, paradigm, type, lemmas}} for every
-    unique (form, paradigm, type) → all associated lemmas.
+    unique (form, paradigm, type) to all associated lemmas.
     """
     seen = {}
     pattern = re.compile(r"ens_str\('([^']+)'\)")
@@ -83,7 +89,7 @@ def build_lemma_map():
             else:
                 seen[key]["lemmas"].add(lemma)
 
-    # Map filename → info
+    # Map filename info
     file_map = {}
     for info in seen.values():
         fname = f"{info['form'].replace(' ', '_')}_{info['paradigm']}_{info['type']}.html"
@@ -92,37 +98,71 @@ def build_lemma_map():
     return file_map
 
 
-def find_declension_table(html):
-    soup = BeautifulSoup(html, "html.parser")
+def _parse_filename(fname):
+    """Parse (form, paradigm, type) from 'abipu{_}aisis_28_cp.html'."""
+    m = FILENAME_RE.match(fname)
+    if not m:
+        return None, None, None
+    form = m.group(1).replace('_', ' ')
+    return form, m.group(2), m.group(3)
+
+
+def _extract_lemma_from_html(html):
+    """Extract the lemma from '<b>FORM</b> - ... : <b>LEMMA</b>'."""
+    m = LEMMA_RE.search(html)
+    return m.group(1) if m else None
+
+
+def _is_adj_table(table_el):
+    """Check if table has genderxnumber headers as DIRECT children.
+
+    Uses recursive=False because wrapper tables also contain adjacent
+    th elements in their descendants and would otherwise false-match.
+    """
+    for th in table_el.find_all("th", recursive=False):
+        parts = th.get_text(strip=True).split()
+        if len(parts) == 2 and parts[0] in ("m", "f", "n") and parts[1] in ("sg", "pl"):
+            return True
+    return False
+
+
+def find_declension_tables(html):
+    """Find both the indefinite and pronominal (definite) declension tables.
+
+    Returns (indefinite_decl, pronominal_decl_or_None).
+    """
+    soup = BeautifulSoup(html, "lxml")
     boldtable = soup.find("table", class_="boldtable")
     if not boldtable:
-        return None
+        return None, None
+
+    adj_tables = []
     for inner in boldtable.find_all("table"):
-        if _adj_columns(inner):
-            return _parse_adj_declension(inner)
+        if _is_adj_table(inner):
+            adj_tables.append(_parse_adj_declension(inner))
+
+    if not adj_tables:
+        return None, None
+    indefinite = adj_tables[0]
+    pronominal = adj_tables[1] if len(adj_tables) > 1 else None
+    return indefinite, pronominal
+
+
+def _extract_pcps_adverb(soup):
+    """Extract the Adwerban: value from a pcps participle page."""
+    for b in soup.find_all("b"):
+        if b.get_text(strip=True).rstrip(":") == "Adwerban":
+            row = b.find_parent("tr")
+            if not row:
+                return None
+            cells = row.find_all("td", recursive=False)
+            if len(cells) >= 2:
+                return _cell_text(cells[1])
     return None
 
 
-def parse_type_from_html(html):
-    m = re.search(r"<b>[^<]+</b>\s*-\s*(.*?)ezze\s+[^:]+:", html, re.DOTALL)
-    if not m:
-        return None
-    desc = m.group(1).strip()
-    if "kōmparatiws" in desc:
-        return "cp"
-    elif "superlatīws" in desc:
-        return "sp"
-    elif "particīps" in desc:
-        if "pasīws" in desc:
-            return "pcptpa"
-        elif "aktīws" in desc:
-            return "pcptac"
-        else:
-            return "pcps"
-    return None
-
-
-def merge_into_entry(entry, form, typ, declension, force):
+def merge_into_entry(entry, form, typ, declension, force,
+                     adverb=None, declension_pronominal=None):
     forms = entry.setdefault("forms", {})
 
     if typ in ("cp", "sp"):
@@ -140,12 +180,21 @@ def merge_into_entry(entry, form, typ, declension, force):
                 if p.get("full_declension") and not force:
                     return False
                 p["full_declension"] = declension
+                if adverb:
+                    p["adverb"] = adverb
+                if declension_pronominal:
+                    p["full_declension_pronominal"] = declension_pronominal
                 return True
-        participles.append({
+        new_part = {
             "type": part_name,
             "form": form,
             "full_declension": declension,
-        })
+        }
+        if adverb:
+            new_part["adverb"] = adverb
+        if declension_pronominal:
+            new_part["full_declension_pronominal"] = declension_pronominal
+        participles.append(new_part)
         forms["participles"] = participles
         return True
 
@@ -179,38 +228,55 @@ def run(force=False, stats_only=False):
         if not fname.endswith(".html"):
             continue
 
-        info = file_map.get(fname)
-        if not info:
-            stats["orphaned"] += 1
-            continue
-
         path = os.path.join(STRING_DIR, fname)
         html = open(path, encoding="utf-8").read()
 
-        typ = parse_type_from_html(html)
-        if not typ:
-            stats["errors"] += 1
-            print(f"  [SKIP] {fname}: could not determine type", file=sys.stderr)
-            continue
+        # Determine type and form: prefer lemma_map, fall back to filename
+        info = file_map.get(fname)
+        if info:
+            typ = info["type"]
+            form = info["form"]
+        else:
+            form, _, typ = _parse_filename(fname)
+            if not typ:
+                stats["errors"] += 1
+                print(f"  [SKIP] {fname}: invalid filename", file=sys.stderr)
+                continue
 
-        declension = find_declension_table(html)
+        declension, declension_pronominal = find_declension_tables(html)
         if not declension:
             stats["errors"] += 1
             print(f"  [SKIP] {fname}: no valid declension table", file=sys.stderr)
             continue
 
+        adverb = None
+        if typ == "pcps":
+            soup = BeautifulSoup(html, "html.parser")
+            adverb = _extract_pcps_adverb(soup)
+
         stats["parsed"] += 1
 
-        form = info["form"]
+        # Collect lemmas: from lemma_map, or extract from HTML for orphaned files
         merged_any = False
-        for lemma in info["lemmas"]:
+        if info:
+            lemmas = info["lemmas"]
+        else:
+            lemma = _extract_lemma_from_html(html)
+            if lemma:
+                lemmas = [lemma]
+            else:
+                stats["orphaned"] += 1
+                continue
+
+        for lemma in lemmas:
             matches = entry_index.get(lemma.lower(), [])
             if not matches:
                 if lemma not in stats["not_found"]:
                     stats["not_found"].append(lemma)
                 continue
             for idx, entry in matches:
-                if merge_into_entry(entry, form, typ, declension, force):
+                if merge_into_entry(entry, form, typ, declension, force,
+                                    adverb=adverb, declension_pronominal=declension_pronominal):
                     merged_any = True
 
         if merged_any:
@@ -237,8 +303,8 @@ def print_stats(stats):
     print(f"Files in string/:   {stats['total_files']}", file=sys.stderr)
     print(f"  orphaned:         {stats['orphaned']}", file=sys.stderr)
     print(f"Parsed OK:          {stats['parsed']}", file=sys.stderr)
-    print(f"  → cp/sp merged:   {stats['merged_cp_sp']}", file=sys.stderr)
-    print(f"  → pcp merged:     {stats['merged_pcp']}", file=sys.stderr)
+    print(f"  -> cp/sp merged:   {stats['merged_cp_sp']}", file=sys.stderr)
+    print(f"  -> pcp merged:     {stats['merged_pcp']}", file=sys.stderr)
     print(f"Errors:             {stats['errors']}", file=sys.stderr)
     if stats["not_found"]:
         print(f"Lemmas not found:   {len(stats['not_found'])}", file=sys.stderr)

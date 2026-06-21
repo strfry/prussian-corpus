@@ -53,9 +53,18 @@ make release
 
 ## Releases herunterladen
 
+Jedes Release enthält drei Artefakte:
+- `twanksta_entries.json` — Wörterbuch Twanksta (strukturiert)
+- `prusaspira_entries.json` — Wörterbuch Prusaspira (strukturiert)
+- `prussian_corpus_*.tar.zst` — Artikeltexte und weitere Korpusdaten
+
 ```bash
-gh release download v2026-06-20 --repo strfry/prussian-corpus --pattern "*.tar.zst"
-tar --zstd -xf prussian_raw_v2026-06-20.tar.zst
+# Alles herunterladen
+gh release download v2026-06-20 --repo strfry/prussian-corpus
+tar --zstd -xf prussian_corpus_v2026-06-20.tar.zst
+
+# Nur die Wörterbücher
+gh release download v2026-06-20 --repo strfry/prussian-corpus --pattern "*.json"
 ```
 
 ## Struktur

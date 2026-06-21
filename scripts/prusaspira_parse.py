@@ -41,7 +41,7 @@ PS_CASE_MAP = {
 # Prusaspira column headers → pd.json tense names (indicative) or mood keys
 PS_IND_TENSES = {
     "tēntisku": "Present",
-    "pragūbingisku": "Habitual",
+    "pragūbingisku": "Past",
     "perfektan": "Perfect",
     "perejīngisku": "Future",
 }
@@ -70,7 +70,8 @@ def normalize_initial(ch):
 
 
 def _cell_text(td):
-    return " ".join(td.get_text().split()) or None
+    text = " ".join(td.get_text().split())
+    return re.sub(r'\s*/\s*', ' / ', text).strip() if text else None
 
 
 def _parse_noun_table(table_el):
@@ -102,6 +103,20 @@ def _parse_noun_table(table_el):
             cases.append(row)
 
     return [{"gender": "", "cases": cases}]
+
+
+def _pronominal_strip(val):
+    """Remove pronoun prefixes from Perfect/Future form strings.
+
+    Prusaspira includes the subject pronoun in the form cell
+    (e.g. "As asma ...", "... ast ...").  Strip it so only the
+    verb phrase remains, matching the twanksta convention.
+    """
+    if not val:
+        return val
+    # Prusaspira has full pronoun or "..." as placeholder
+    val = re.sub(r'^(As\s+|Tū\s+|Mes\s+|Jūs\s+|\.\.\.\s+)', '', val)
+    return val
 
 
 def _parse_verb_table_raw(table_raw_html, col_headers):
@@ -141,11 +156,13 @@ def _parse_verb_table_raw(table_raw_html, col_headers):
                 continue
 
             val = " ".join(re.sub(r"<[^>]+>", "", cell_html).split())
+            val = re.sub(r'\s*/\s*', ' / ', val).strip()
             if not val:
                 continue
 
             if col in PS_IND_TENSES:
                 tense_name = PS_IND_TENSES[col]
+                val = _pronominal_strip(val)
                 indicative.setdefault(tense_name, []).append({"pronoun": pronoun, "form": val})
             elif col == "imperatīws":
                 imperative.append({"pronoun": pronoun, "form": val})
@@ -156,6 +173,13 @@ def _parse_verb_table_raw(table_raw_html, col_headers):
 
     result = {}
     if indicative:
+        for tense in ("Perfect", "Future"):
+            if tense in indicative:
+                forms = indicative[tense]
+                indicative[tense] = [
+                    {"pronoun": "tāns/tenā", "form": f["form"]} if f["pronoun"] == "tāns/tenā/tennan" else f
+                    for f in forms
+                ]
         result["indicative"] = [
             {"tense": tense, "forms": forms}
             for tense, forms in indicative.items()

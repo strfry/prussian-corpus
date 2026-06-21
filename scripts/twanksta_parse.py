@@ -38,8 +38,12 @@ BASE_URL = "https://wirdeins.twanksta.org"
 _VERB_TENSES = {"Present", "Past", "Perfect", "Future", "Habitual"}
 
 
+def _normalize_slashes(text):
+    return re.sub(r'\s*/\s*', ' / ', text).strip()
+
 def _verb_form(text):
-    return " ".join(text.split()) or None
+    val = _normalize_slashes(" ".join(text.split()))
+    return val or None
 
 
 def _pcpt_type(stem):
@@ -67,7 +71,7 @@ def parse_noun_cases(table):
             if i >= len(headers):
                 break
             form_el = td.find(class_="verb")
-            val = form_el.get_text(strip=True) if form_el else td.get_text(strip=True)
+            val = _normalize_slashes(form_el.get_text(strip=True) if form_el else td.get_text(strip=True))
             if headers[i] == "sing":
                 row["singular"] = val
             elif headers[i] == "plur":
@@ -222,6 +226,30 @@ def parse_forms(html):
     return {"declension": parse_noun_table(subst_tables[0])}
 
 
+def _strip_paradigm_suffix(val, paradigm):
+    if not paradigm or not isinstance(val, str):
+        return val
+    # Strip from each slash-separated segment independently
+    parts = val.split(' / ')
+    cleaned = []
+    for part in parts:
+        p = part.strip()
+        if p.endswith(paradigm) and len(p) > len(paradigm):
+            p = p[:-len(paradigm)].strip()
+        cleaned.append(p)
+    return ' / '.join(cleaned)
+
+
+def _clean_forms(forms, paradigm):
+    if isinstance(forms, str):
+        return _strip_paradigm_suffix(forms, paradigm)
+    if isinstance(forms, list):
+        return [_clean_forms(item, paradigm) for item in forms]
+    if isinstance(forms, dict):
+        return {k: _clean_forms(v, paradigm) for k, v in forms.items()}
+    return forms
+
+
 def parse_entry_html(html):
     """Extract fields from a single-word search result HTML (one <li>)."""
     soup = BeautifulSoup(html, "html.parser")
@@ -283,6 +311,7 @@ def parse_word(word, paradigm):
         form_path = os.path.join(FORMS_DIR, f"{paradigm}_{word}.html")
         if os.path.exists(form_path):
             forms = parse_forms(open(form_path, encoding="utf-8").read())
+            forms = _clean_forms(forms, base["paradigm"])
 
     return {
         "word": base["word"],

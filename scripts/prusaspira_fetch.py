@@ -36,7 +36,7 @@ import sys
 
 BASE = "https://www.prusaspira.org/wirdeins"
 PARAMS = {"akc": "Iz", "tap": "W", "bila": "1"}
-DELAY = 2.0
+DELAY = 0.2
 
 # Prusaspira is diacritic-agnostic on the initial letter:
 # wirds=a and wirds=ā return identical results, same for s/š, e/ē etc.

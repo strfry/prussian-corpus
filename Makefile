@@ -1,7 +1,8 @@
 PYTHON = python3
 SCRIPTS = scripts
 
-.PHONY: twanksta-enumerate twanksta-fetch twanksta-parse prusaspira-fetch prusaspira-parse \
+.PHONY: twanksta-enumerate twanksta-fetch twanksta-parse twanksta-articles-parse \
+        prusaspira-fetch prusaspira-parse \
         prusaspira-extended prusaspira-extended-parse \
         release status test-twanksta-enumerate test-twanksta-fetch test-prusaspira-fetch \
         test-prusaspira-extended
@@ -22,6 +23,10 @@ prusaspira-fetch:
 twanksta-parse:
 	$(PYTHON) $(SCRIPTS)/twanksta_parse.py
 
+# Phase 4b: extract article/description content from twanksta HTML
+twanksta-articles-parse:
+	$(PYTHON) $(SCRIPTS)/twanksta_articles_parse.py
+
 # Phase 5: parse prusaspira HTML into structured JSON
 prusaspira-parse:
 	$(PYTHON) $(SCRIPTS)/prusaspira_parse.py
@@ -37,15 +42,15 @@ prusaspira-extended-parse:
 # Create a versioned release archive and upload to GitHub Releases
 release:
 	@VERSION=$$(date +v%Y-%m-%d); \
-	ARCHIVE=prussian_raw_$${VERSION}.tar.zst; \
+	ARCHIVE=prussian_corpus_$${VERSION}.tar.zst; \
 	echo "Creating $$ARCHIVE..."; \
-	tar --zstd -cf $$ARCHIVE raw/; \
-	sha256sum $$ARCHIVE > SHA256SUMS; \
+	tar --zstd -cf $$ARCHIVE --exclude='parsed/twanksta_entries.json' --exclude='parsed/prusaspira_entries.json' parsed/; \
 	echo "Uploading to GitHub Releases as $$VERSION..."; \
-	gh release create $$VERSION $$ARCHIVE SHA256SUMS \
-		--title "Prussian corpus raw data $$VERSION" \
-		--notes "Scraped from wirdeins.twanksta.org and prusaspira.org. See README.md for details."; \
-	echo "Done: $$ARCHIVE"
+	gh release create $$VERSION \
+		parsed/twanksta_entries.json parsed/prusaspira_entries.json $$ARCHIVE \
+		--title "Prussian corpus parsed data $$VERSION" \
+		--notes "Parsed dictionary entries from wirdeins.twanksta.org and prusaspira.org. See README.md for details."; \
+	echo "Done: $$VERSION"
 
 # Status overview
 status:
