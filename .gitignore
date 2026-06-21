@@ -1,0 +1,6 @@
+raw/
+parsed/
+*.tar.zst
+SHA256SUMS
+__pycache__/
+*.pyc

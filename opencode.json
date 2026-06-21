@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "prussian-dictionary": {
+      "type": "remote",
+      "url": "https://strfry.org/prussian-mcp/mcp",
+      "enabled": true,
+      "timeout": 10000
+    }
+  }
+}
