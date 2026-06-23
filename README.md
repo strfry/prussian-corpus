@@ -46,27 +46,20 @@ deshalb als Quelldatei mit eingecheckt (nicht neu gescrapt). Begleitend:
 `data/sources/gramm.htm` (Grammatiktafeln, Referenz). Verbraucht von
 `prussian-fst` (Paradigmenvergleich → Goldstandard).
 
-## Dictionary-Build
-
-Aus den geparsten Einträgen wird das kanonische `prussian_dictionary.json`
-gebaut (`scripts/build_dictionary.py`, `make dictionary`). Das ist das
-Artefakt, das **prussian-mcp** (als Eingabe für `generate_embeddings.py`) und
-**prussian-lora** (Vokabel-Korpus) konsumieren. Standardmäßig entspricht es
-exakt dem Twanksta-Parse — so bleibt die Einträgemenge (und mcps
-Embedding-Ausrichtung) stabil; `make dictionary WITH_PRUSASPIRA=1` ergänzt
-zusätzlich nur-in-Prusaspira vorhandene Lemmata.
-
 ## Downstream-Konsumenten
 
 Dieses Repo ist die **einzige** Stelle, an der altpreußische Quelldaten
 gescrapt/gesammelt und geparst werden. Andere Repos scrapen nicht selbst,
-sondern beziehen die Release-Artefakte:
+sondern beziehen die Release-Artefakte (einzelne Assets je Datei, siehe
+[Releases](https://github.com/strfry/prussian-corpus/releases)). Die
+Twanksta-Wörterbuch-Datei heißt `twanksta_entries.json` (das ehemalige
+`prussian_dictionary.json` existiert nicht mehr).
 
 | Repo | Konsumiert | Wie |
 |---|---|---|
-| `prussian-mcp` | `prussian_dictionary.json` | Eingabe für `generate_embeddings.py` |
+| `prussian-mcp` | `twanksta_entries.json` | Eingabe für `generate_embeddings.py` (`data/twanksta_entries.json`) |
 | `prussian-fst` | `twanksta_entries.json`, `prusaspira_entries.json`, `tabula.html` | unter `data/external/` ablegen |
-| `prussian-lora` | `prussian_dictionary.json` | Vokabel-Korpus-Generierung |
+| `prussian-lora` | `twanksta_entries.json` | Vokabel-Korpus-Generierung |
 
 ## Verwendung
 
@@ -77,7 +70,6 @@ make twanksta-fetch       # Phase 2: Twanksta HTML cachen (Stunden)
 make prusaspira-fetch     # Prusaspira HTML cachen (Stunden)
 make twanksta-parse       # HTML → parsed/twanksta_entries.json
 make prusaspira-parse     # HTML → parsed/prusaspira_entries.json
-make dictionary           # parsed/* → parsed/prussian_dictionary.json
 
 # Fortschritt
 make status
@@ -103,8 +95,7 @@ prussian-corpus/
 │   ├── twanksta_parse.py       # HTML → twanksta_entries.json
 │   ├── prusaspira_fetch.py     # Prusaspira HTML-Cache (by-letter + extended)
 │   ├── prusaspira_parse.py     # HTML → prusaspira_entries.json
-│   ├── prusaspira_extended_parse.py
-│   └── build_dictionary.py     # parsed/* → prussian_dictionary.json
+│   └── prusaspira_extended_parse.py
 ├── data/sources/               # eingecheckte Quelldateien (in Git)
 │   ├── tabula.html             # Paradigmentafel 1–144 (halb-manuell korrigiert)
 │   └── gramm.htm               # Grammatiktafeln (Referenz)
@@ -116,8 +107,7 @@ prussian-corpus/
 │   ├── twanksta/{entries,forms}/
 │   └── prusaspira/by_letter/   # {letter}.html (alle Einträge je Anfangsbuchstabe)
 ├── parsed/                     # geparste Artefakte (.gitignore; via Release)
-│   ├── twanksta_entries.json
-│   ├── prusaspira_entries.json
-│   └── prussian_dictionary.json
+│   ├── twanksta_entries.json   # Twanksta-Wörterbuch (mcp/lora-Eingabe)
+│   └── prusaspira_entries.json
 └── Makefile
 ```

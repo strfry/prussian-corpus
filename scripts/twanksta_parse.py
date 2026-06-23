@@ -10,7 +10,7 @@ Input:
 Output:
   parsed/twanksta_entries.json
 
-Schema per entry (mirrors prussian_dictionary.json):
+Schema per entry (the shared dictionary entry schema):
   word, paradigm, gender, desc, audio, translations, forms
 
 Usage:

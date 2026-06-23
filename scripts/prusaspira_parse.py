@@ -5,7 +5,7 @@ Parse cached prusaspira HTML into a flat JSON list (parsed/prusaspira_entries.js
 Input:  raw/prusaspira/by_letter/{a..z}.html  (23 files)
 Output: parsed/prusaspira_entries.json
 
-Schema per entry (mirrors prussian_dictionary.json):
+Schema per entry (the shared dictionary entry schema):
   word, paradigm, gender, desc, audio, translations, forms
 
 Usage:
