@@ -36,13 +36,48 @@ Buchstabenseiten nur als Stichwort-Link (`ens_str(...)`) und lassen sich über e
 Gespeichert:
 - `raw/prusaspira/by_letter/{letter}.html` — alle Einträge pro Anfangsbuchstabe
 
+### Tabula Nova (`data/sources/tabula.html`)
+
+Manuell gepflegte HTML-Referenztabelle aller altpreußischen Flexionsparadigmen
+(Nr. 1–144) von `donelaitis.vdu.lt/prussian/tabula.htm` (Spiegel auf
+prusaspira.org). Das kaputte Roh-HTML wurde **halb-manuell** zu `tabula.html`
+korrigiert; diese Korrektur ist die einzige nicht-automatische Vorstufe und wird
+deshalb als Quelldatei mit eingecheckt (nicht neu gescrapt). Begleitend:
+`data/sources/gramm.htm` (Grammatiktafeln, Referenz). Verbraucht von
+`prussian-fst` (Paradigmenvergleich → Goldstandard).
+
+## Dictionary-Build
+
+Aus den geparsten Einträgen wird das kanonische `prussian_dictionary.json`
+gebaut (`scripts/build_dictionary.py`, `make dictionary`). Das ist das
+Artefakt, das **prussian-mcp** (als Eingabe für `generate_embeddings.py`) und
+**prussian-lora** (Vokabel-Korpus) konsumieren. Standardmäßig entspricht es
+exakt dem Twanksta-Parse — so bleibt die Einträgemenge (und mcps
+Embedding-Ausrichtung) stabil; `make dictionary WITH_PRUSASPIRA=1` ergänzt
+zusätzlich nur-in-Prusaspira vorhandene Lemmata.
+
+## Downstream-Konsumenten
+
+Dieses Repo ist die **einzige** Stelle, an der altpreußische Quelldaten
+gescrapt/gesammelt und geparst werden. Andere Repos scrapen nicht selbst,
+sondern beziehen die Release-Artefakte:
+
+| Repo | Konsumiert | Wie |
+|---|---|---|
+| `prussian-mcp` | `prussian_dictionary.json` | Eingabe für `generate_embeddings.py` |
+| `prussian-fst` | `twanksta_entries.json`, `prusaspira_entries.json`, `tabula.html` | unter `data/external/` ablegen |
+| `prussian-lora` | `prussian_dictionary.json` | Vokabel-Korpus-Generierung |
+
 ## Verwendung
 
 ```bash
 # Vollständiges Scraping (bei Abbruch fortsetzbar)
-make enumerate    # Phase 1: Wortliste aufbauen
-make fetch        # Phase 2: Twanksta HTML cachen (Stunden)
-make prusaspira   # Prusaspira HTML cachen (Stunden)
+make twanksta-enumerate   # Phase 1: Wortliste aufbauen
+make twanksta-fetch       # Phase 2: Twanksta HTML cachen (Stunden)
+make prusaspira-fetch     # Prusaspira HTML cachen (Stunden)
+make twanksta-parse       # HTML → parsed/twanksta_entries.json
+make prusaspira-parse     # HTML → parsed/prusaspira_entries.json
+make dictionary           # parsed/* → parsed/prussian_dictionary.json
 
 # Fortschritt
 make status
@@ -65,17 +100,24 @@ prussian-corpus/
 ├── scripts/
 │   ├── twanksta_enumerate.py   # Phase 1: Wortliste
 │   ├── twanksta_fetch.py       # Phase 2: HTML-Cache
-│   └── prusaspira_fetch.py     # Prusaspira HTML-Cache
+│   ├── twanksta_parse.py       # HTML → twanksta_entries.json
+│   ├── prusaspira_fetch.py     # Prusaspira HTML-Cache (by-letter + extended)
+│   ├── prusaspira_parse.py     # HTML → prusaspira_entries.json
+│   ├── prusaspira_extended_parse.py
+│   └── build_dictionary.py     # parsed/* → prussian_dictionary.json
+├── data/sources/               # eingecheckte Quelldateien (in Git)
+│   ├── tabula.html             # Paradigmentafel 1–144 (halb-manuell korrigiert)
+│   └── gramm.htm               # Grammatiktafeln (Referenz)
 ├── state/                      # Scraping-Fortschritt (in Git)
 │   ├── twanksta_wordlist.json  # 10.698+ Lemmata
-│   ├── enumerate_state.json    # Fortschritt Phase 1
 │   ├── fetch_state.json        # Fortschritt Phase 2
 │   └── prusaspira_state.json   # Prusaspira-Fortschritt
 ├── raw/                        # Rohdaten (.gitignore)
-│   ├── twanksta/
-│   │   ├── entries/            # {word}/{lang}.html
-│   │   └── forms/              # {num}_{word}.html
-│   └── prusaspira/
-│       └── by_letter/          # {letter}.html (alle Einträge je Anfangsbuchstabe)
+│   ├── twanksta/{entries,forms}/
+│   └── prusaspira/by_letter/   # {letter}.html (alle Einträge je Anfangsbuchstabe)
+├── parsed/                     # geparste Artefakte (.gitignore; via Release)
+│   ├── twanksta_entries.json
+│   ├── prusaspira_entries.json
+│   └── prussian_dictionary.json
 └── Makefile
 ```
