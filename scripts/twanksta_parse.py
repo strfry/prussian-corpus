@@ -250,12 +250,8 @@ def _clean_forms(forms, paradigm):
     return forms
 
 
-def parse_entry_html(html):
-    """Extract fields from a single-word search result HTML (one <li>)."""
-    soup = BeautifulSoup(html, "html.parser")
-    li = soup.find("li")
-    if not li:
-        return None
+def parse_entry_li(li):
+    """Extract fields from a single <li> element (one search result)."""
     word_el = li.find(class_="word")
     if not word_el:
         return None
@@ -284,44 +280,68 @@ def parse_entry_html(html):
     }
 
 
+def parse_all_li(html):
+    """Parse all <li> search results from HTML, return list of entry dicts."""
+    soup = BeautifulSoup(html, "html.parser")
+    entries = []
+    for li in soup.find_all("li"):
+        entry = parse_entry_li(li)
+        if entry:
+            entries.append(entry)
+    return entries
+
+
 def parse_word(word, paradigm):
-    """Parse all cached files for one word, return entry dict or None."""
+    """Parse all cached files for one search word, return list of entry dicts.
+
+    A single search result may contain multiple <li> entries (different
+    words matched by the search engine). All of them are returned.
+    Duplicates across different search words are handled by the caller.
+    """
     entry_dir = os.path.join(ENTRIES_DIR, word)
     if not os.path.isdir(entry_dir):
-        return None
+        return []
     engl_path = os.path.join(entry_dir, "engl.html")
     if not os.path.exists(engl_path):
-        return None
+        return []
 
-    base = parse_entry_html(open(engl_path, encoding="utf-8").read())
-    if not base:
-        return None
+    bases = parse_all_li(open(engl_path, encoding="utf-8").read())
+    if not bases:
+        return []
 
-    translations = {"engl": base.pop("translations")}
+    translations_per_entry = [{"engl": b.pop("translations")} for b in bases]
+
     for lang in LANGS[1:]:
         p = os.path.join(entry_dir, f"{lang}.html")
         if not os.path.exists(p):
             continue
-        parsed = parse_entry_html(open(p, encoding="utf-8").read())
-        if parsed:
-            translations[lang] = parsed["translations"]
+        other_entries = parse_all_li(open(p, encoding="utf-8").read())
+        for i, base in enumerate(bases):
+            for other in other_entries:
+                if other["word"] == base["word"]:
+                    translations_per_entry[i][lang] = other["translations"]
+                    break
 
-    forms = {}
-    if paradigm:
-        form_path = os.path.join(FORMS_DIR, f"{paradigm}_{word}.html")
-        if os.path.exists(form_path):
-            forms = parse_forms(open(form_path, encoding="utf-8").read())
-            forms = _clean_forms(forms, base["paradigm"])
+    entries = []
+    for base, translations in zip(bases, translations_per_entry):
+        forms = {}
+        if base["paradigm"]:
+            form_path = os.path.join(FORMS_DIR, f"{base['paradigm']}_{base['word']}.html")
+            if os.path.exists(form_path):
+                forms = parse_forms(open(form_path, encoding="utf-8").read())
+                forms = _clean_forms(forms, base["paradigm"])
 
-    return {
-        "word": base["word"],
-        "paradigm": base["paradigm"],
-        "gender": base["gender"],
-        "desc": base["desc"],
-        "audio": base["audio"],
-        "translations": translations,
-        "forms": forms,
-    }
+        entries.append({
+            "word": base["word"],
+            "paradigm": base["paradigm"],
+            "gender": base["gender"],
+            "desc": base["desc"],
+            "audio": base["audio"],
+            "translations": translations,
+            "forms": forms,
+        })
+
+    return entries
 
 
 def run(target_word=None):
@@ -331,15 +351,20 @@ def run(target_word=None):
         wordlist = [w for w in wordlist if w["word"] == target_word]
 
     entries = []
+    seen = set()
     skipped = 0
     for item in wordlist:
         word = item["word"]
         paradigm = item.get("paradigm", "")
-        entry = parse_word(word, paradigm)
-        if entry is None:
+        new_entries = parse_word(word, paradigm)
+        if not new_entries:
             skipped += 1
             continue
-        entries.append(entry)
+        for entry in new_entries:
+            key = (entry["word"], entry["paradigm"], entry["desc"])
+            if key not in seen:
+                seen.add(key)
+                entries.append(entry)
 
     if target_word:
         print(json.dumps(entries, ensure_ascii=False, indent=2))
