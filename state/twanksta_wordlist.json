@@ -118702,5 +118702,2819 @@
     "audio": "",
     "translations_engl": [],
     "description": ""
+  },
+  {
+    "word": "galbimai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Galbtweips 1 sg m [galbimai 31]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "galbsei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Galbtweiop [Galbsai 81]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagalban",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagalbaacc [pogalban 101]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagalbenikan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagalbenīksacc [pogālbenikan 91]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagalbtan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagalbtweipc pt pa n [pogalbton 115]",
+    "audio": "",
+    "translations_engl": [
+      "helped"
+    ]
+  },
+  {
+    "word": "malnīkai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Malnīksnom sg m [malnijkai 47]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "malnīkan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Malnīksacc sg [malnijkan 133]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "malnīkans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Malnīksacc sg m [malnijkans 37]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "malnīkas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Malnīksgen sg [malnijkas 115]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "malnīkikai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Malnīkiksnom sg m [malnijkikai 111(14)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pamērisnans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pamērisnaacc sg m [pomijrisnans 33]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pamēritwei",
+    "paradigm": "138",
+    "gender": "",
+    "desc": "[pomīrit 95]",
+    "audio": "",
+    "translations_engl": [
+      "to think"
+    ]
+  },
+  {
+    "word": "pamestan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pamestsn (av) [pomeston 103]",
+    "audio": "",
+    "translations_engl": [
+      "subjectedly"
+    ]
+  },
+  {
+    "word": "aīnapausiskai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "av  [Pāusan + einerseits, andererseits MK]",
+    "audio": "",
+    "translations_engl": [
+      "on the one hand"
+    ]
+  },
+  {
+    "word": "Flāndrai",
+    "paradigm": "32",
+    "gender": "masc",
+    "desc": "NOM PL m [Flandern, Flanders MK]",
+    "audio": "",
+    "translations_engl": [
+      "Flanders"
+    ]
+  },
+  {
+    "word": "gelāndlan",
+    "paradigm": "35",
+    "gender": "neut",
+    "desc": "[geluonis, dzelonis, žangɫo (kašūb), zǫdlü, geldlo, galanda]",
+    "audio": "",
+    "translations_engl": [
+      "stinger",
+      "sting"
+    ]
+  },
+  {
+    "word": "lanka",
+    "paradigm": "45",
+    "gender": "fem",
+    "desc": "[\tlanka + Lankaym (1430), (Krummelanke Berlin), lanka Cur + łąka VM MK]",
+    "audio": "",
+    "translations_engl": [
+      "bay (small sea bay)",
+      "meadow (large water-meadow in coastal lowlands)"
+    ]
+  },
+  {
+    "word": "bangādelbi",
+    "paradigm": "52",
+    "gender": "fem",
+    "desc": "[Bangā + dēlbtun, bangomūšis MK]",
+    "audio": "",
+    "translations_engl": [
+      "surf"
+    ]
+  },
+  {
+    "word": "mangas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Mangagen [Mangos Gr]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "enteikātan",
+    "paradigm": "69",
+    "gender": "",
+    "desc": "↑Enteikātunpc pt pa nom sg n [Enteikūton 89]",
+    "audio": "",
+    "translations_engl": [
+      "arranged (regulated)"
+    ]
+  },
+  {
+    "word": "dāngun",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dāngsacc [dangon 47]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "rānguns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Rāngtunpc pt ac nom sg m [ranguns 67]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "antrā",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Āntarsf [Antrā 49]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "āntersmu",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Āntarsdat [Antersmu 59]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "āntran",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Āntarsacc [āntran 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "fantastisks",
+    "paradigm": "25",
+    "gender": "",
+    "desc": "AJ [fantastisch MK]",
+    "audio": "",
+    "translations_engl": [
+      "fantastic"
+    ]
+  },
+  {
+    "word": "klāntamai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Klantītun, ↑Klantītweips 1 sg m [klantemmai 29]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "giwāntjai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Gīwītweipc ps ac, av [giwāntei 97]",
+    "audio": "",
+    "translations_engl": [
+      "living"
+    ]
+  },
+  {
+    "word": "waitjāntins",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Waiţātweipc ps ac acc sg m [waitiaintins 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "klantīsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Klantīsnāacc [klantīsnan 69]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perklantīsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perklantīsnāacc [perklantīsnan 115(6)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perklantīt",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perklantītunpc pt pa n [perklantīt 113]",
+    "audio": "",
+    "translations_engl": [
+      "condemned",
+      "cursed"
+    ]
+  },
+  {
+    "word": "perklantītan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perklantītsacc [perklantīton 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perklantīts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perklantītunpc pt pa nom sg m [perklantīts 61]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "klantīwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Klantītunpc pt ac [klantīwuns 69(5)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perklantīwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perklantītunpc pt ac nom sg m [perklantīuns 119]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "skelāntjai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Skelītunpc ps ac nom pl m [skellāntei 37]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kārmels",
+    "paradigm": "36",
+    "gender": "masc",
+    "desc": "[Karmel DIA  MK]",
+    "audio": "",
+    "translations_engl": [
+      "stone (pit)",
+      "pit",
+      "pip",
+      "kernel  (seed of a  fruit)"
+    ]
+  },
+  {
+    "word": "wārminin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wārmisaj acc sg pnl [urminan 119]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wāraisjai",
+    "paradigm": "40",
+    "gender": "masc",
+    "desc": "↑Wārscp no nom pl tantum m [Uraisins 31 drv]",
+    "audio": "",
+    "translations_engl": [
+      "parents"
+    ]
+  },
+  {
+    "word": "wāraisjan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wārsaj cp acc sg [uraisin 93(24)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "paralizītun",
+    "paradigm": "139",
+    "gender": "",
+    "desc": "[paralysieren MK]",
+    "audio": "",
+    "translations_engl": [
+      "to paralyse"
+    ]
+  },
+  {
+    "word": "wārammans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wārsdat pl m [uremmans 115(9)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sklāitun",
+    "paradigm": "107",
+    "gender": "",
+    "desc": "tr [schklāits III  59, sklieti VM]",
+    "audio": "",
+    "translations_engl": [
+      "to disperse tr",
+      "to  dissipate (to  scatter)",
+      "to scatter (to dissipate)",
+      "to  part (to open  pushing parts  aside)",
+      "to spill tr  (to spill smth on  a surface)"
+    ]
+  },
+  {
+    "word": "ebwinūtasis",
+    "paradigm": "40",
+    "gender": "masc",
+    "desc": "↑Ebwinūtunpc pt pa pnl [(ni)ebwinūts 87 MK]",
+    "audio": "",
+    "translations_engl": [
+      "indictee",
+      "accused"
+    ]
+  },
+  {
+    "word": "aūsan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Aūssacc [Ausin 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "ausāins būrs",
+    "paradigm": "32",
+    "gender": "masc",
+    "desc": "[būr DIA,  Gold- DIA  MK]",
+    "audio": "",
+    "translations_engl": [
+      "bunting  (yellow  bunting)"
+    ]
+  },
+  {
+    "word": "aušaudēi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Aušaudītweips 3 [auschaudē 61]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "jūsepausiskai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "av  [Jūse, Pāusan + eurerseits MK]",
+    "audio": "",
+    "translations_engl": [
+      "for your part"
+    ]
+  },
+  {
+    "word": "lāustinaiti si",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Lāustintun siip 2 sg m [laustineiti wans 97]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "lāustingins",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Lāustingisacc sg m [Lāustingins 97(5)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "naūtei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Naūtsdat sg f [nautei 29]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "naūtin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Naūtsacc sg [nautin 91]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "nautins",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Naūtsacc sg m [nautins 31]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dīnkauts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dīnkautweimod rel pt [dīnkauts 75(3)]",
+    "audio": "",
+    "translations_engl": [
+      "allegedly thanked"
+    ]
+  },
+  {
+    "word": "pagaūts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagaūtunpc pt pa nom sg m [pagauts II 7]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dāis",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dātweiip 2 sg [dais 53]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kānklis",
+    "paradigm": "52",
+    "gender": "fem",
+    "desc": "nom pl tantum f  [kanklės, kokles, kantele MK]",
+    "audio": "",
+    "translations_engl": [
+      "Baltic harp"
+    ]
+  },
+  {
+    "word": "perbānda",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perbandātunps 3 [perbānda 55]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perbāndan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perbāndaacc f [perbandan I 11]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perbandāsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perbandāsnāacc [perbandāsnan 55]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pabanginnuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pabangīntunpc pt ac [pobanginnons 69]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "labbans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Labsacc pl, ↑Labbanacc sg m [labbans , labbans 41]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "subbans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Subsacc pl m [(stans)subbans 37(6)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "bārduks",
+    "paradigm": "32",
+    "gender": "masc",
+    "desc": "↑Bārzduks",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "labasegīsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Labasegīsnāacc [labbasegīsnan 85]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perdwigubāsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perdwigubāsnāacc [perdwibugūsnan 55]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "nidruwīnts",
+    "paradigm": "29",
+    "gender": "",
+    "desc": "↑Druwītweipc ps ac [nidruwīntin 119 drv]",
+    "audio": "",
+    "translations_engl": [
+      "unbelieving",
+      "irreligious",
+      "infidel"
+    ]
+  },
+  {
+    "word": "pībeli",
+    "paradigm": "52",
+    "gender": "fem",
+    "desc": "↑Bībelis",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wābelka",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wāblidm [Wobelke Gr]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "bēi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Būtweipt 3 [bēi 107(4)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "bētas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Bētangen [(po)bītas 75]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "walns",
+    "paradigm": "25",
+    "gender": "",
+    "desc": "↑Labsaj cp [walnennien 35 MK]",
+    "audio": "",
+    "translations_engl": [
+      "better"
+    ]
+  },
+  {
+    "word": "pabrandīnsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pabrandīnsnāacc [pobrandisnan 73]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pabrandīnts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pabrandīntunpc pt pa [pobrendints 69]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "būlai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Būtweicn 3 [boūlai 113]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "būrwalkan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Būrwalksacc m [burwalkan 41]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "buttas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Buttangen sg [Buttas 85]",
+    "audio": "",
+    "translations_engl": [
+      "domestic"
+    ]
+  },
+  {
+    "word": "prābutiskai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Prābutisksdat sg f [prabuskai 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "prābutiskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Prābutiskanacc [prābutskan 43(11)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "prābutiskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Prābutisksacc sg [prābutskan 45(6)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "prābutiskas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Prābutisksgen sg [prabutskas 117(7)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "enprābutskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Emprābutskanav [enprābutskan , 85]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "buttis",
+    "paradigm": "40",
+    "gender": "masc",
+    "desc": "[Budde, Budke, Butz, Buscheboar, Buscher, Buschbau, Butzkeberg, Butterberg DIA   ]",
+    "audio": "",
+    "translations_engl": [
+      "spook (ghost)",
+      "ghost (spook)"
+    ]
+  },
+  {
+    "word": "dwigubāi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dwigubātweips 3 [dwigubbū 77]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "gērbais",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Gērbtunip 2 sg [Gerbais 107]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "gērbaiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Gērbtunip 2 sg m [Gerbaiti 121]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "scenārijan",
+    "paradigm": "45a",
+    "gender": "",
+    "desc": "[Szenarium Pit]",
+    "audio": "",
+    "translations_engl": [
+      "scenario"
+    ]
+  },
+  {
+    "word": "engērdaus",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Engērdautunip 2 sg [engerdaus 69]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "paddaubis",
+    "paradigm": "40",
+    "gender": "masc",
+    "desc": "[Pandaubis E 30]",
+    "audio": "",
+    "translations_engl": [
+      "valley"
+    ]
+  },
+  {
+    "word": "gērdaui",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Gērdautunps 1 sg, ps 3 [gerdawi 113]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagērdaui",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagērdautunps 3 [pogerdawie 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "preigērdaui",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Preigērdautunps 3 [preigerdawi 39]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagērdauja",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagērdaui[pogerdawie 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "panzdaumanin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Panzdaumanisacc [pansdaumannien 61]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "gērdaus",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Gērdautunip 2 sg [Gerdaus 67]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "skelānts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑skelītun[schkellānts 41]",
+    "audio": "",
+    "translations_engl": [
+      "owing (indebted)",
+      "indebted"
+    ]
+  },
+  {
+    "word": "dei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dispn 3 encl nom pl m, f",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dēiwa",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dēiwsvoc [Deiwa 67]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "deīktas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Deīktangen [deicktas 103]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dēinans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dēināacc sg m [deinans 123]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dēiwan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dēiwsacc sg [Deiwan 27(9)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dēiwans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dēiwsacc sg m [Deiwans 27]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dēiwas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dēiwsgen sg m [Deiwas 27]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "budēi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Budītweips 3 [budē 89]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dēininiskan",
+    "paradigm": "35",
+    "gender": "neut",
+    "desc": "[Dēininisks drv MK]",
+    "audio": "",
+    "translations_engl": [
+      "everyday life"
+    ]
+  },
+  {
+    "word": "drjāudeiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Drēuditunip 2 sg m [draudieiti 113]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "ēdeiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Īstunip 2 sg m [edeitte I 13]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "budniks",
+    "paradigm": "32",
+    "gender": "masc",
+    "desc": "↑Glāuptini[Budnik DK]",
+    "audio": "",
+    "translations_engl": [
+      "mouldboard"
+    ]
+  },
+  {
+    "word": "sendraugiwēldnikai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sendraugiwēldniksnom pl tantum m [sendraugiwēldnikai 93]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wāldnikans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wāldniksacc sg m [Wāldnikans 91(15)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wāldniku",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wāldniksdat sg [Waldniku 91(25)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "draška",
+    "paradigm": "45",
+    "gender": "fem",
+    "desc": "[Droschke DIA MK]",
+    "audio": "",
+    "translations_engl": [
+      "coach (cart)",
+      "cart"
+    ]
+  },
+  {
+    "word": "druwēi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Druwītweips , ps 2 sg, ps 1 sg [druwē 61(5), Druwē 127(3), druwē 39]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "druwēimai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Druwītweips 1 sg m [druwēmai 51]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "druwēisei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Druwītweips 2 sg [Druwēse 71(12)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "druwēiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Druwītweips 2 sg m [druwētei 105]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "drūwjan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Drūwisacc [drūwien 45(18)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "druwīngimans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Druwīngisdat sg m [Druwīngimans 121]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "druwīngins",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Druwīngisacc sg m [druwīngins 45]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "padrūktina",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Padrūktintunps 1 sg [Podrūktinai 107]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dānskan",
+    "paradigm": "35",
+    "gender": "neut",
+    "desc": "↑Gudānits[Dāniskan mēstan, Danzig MK]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kawīdans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kawīdsacc sg m [kawīdans 83]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "māldans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Māldsacc sg m [maldans 85]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "stawīdans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Stawīdsacc sg m [stawīdans 39(4)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "undans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Undsacc sg m [undans 119]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wīrdans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wīrdsacc sg m [wirdans 69(3)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dāwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dātweipc pt ac [dāuns 41]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "ēduns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Ēstunpc pt ac [īduns 105]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "maldūnin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Maldūniacc f [Maldūnin 17]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "weldūnai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Weldūnsnom sg m [weldūnai 63]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "prawedduns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Prawestunpc pt ac [prawedduns 119]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sīduns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sīstweipc pt ac [Sīdons 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "denginīsis",
+    "paradigm": "27",
+    "gender": "",
+    "desc": "↑Dengininnisaj pm [Dengenennis , Dengnennissis 79]",
+    "audio": "",
+    "translations_engl": [
+      "(that) celestial",
+      "(that) heavenly"
+    ]
+  },
+  {
+    "word": "ēnda",
+    "paradigm": "45",
+    "gender": "fem",
+    "desc": "[dosis, nuo-da-s + geben  Gift + Īda + indeve, ieds  inde MK]",
+    "audio": "",
+    "translations_engl": [
+      "poison"
+    ]
+  },
+  {
+    "word": "endāst",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Endātunps 3 [endāst 123]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "endirēi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Endirītunpt 3 [endeirā 107]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "endirēis",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Endirītunip 2 sg [endirīs 67]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "empērint",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Empērintunpc pt pa n [empijrint 115]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "māisteriskan",
+    "paradigm": "35",
+    "gender": "neut",
+    "desc": "[Māisteris drv,  Meisterschaft]",
+    "audio": "",
+    "translations_engl": [
+      "championship"
+    ]
+  },
+  {
+    "word": "materiskērmens",
+    "paradigm": "61",
+    "gender": "masc",
+    "desc": "[Māti + Kērmens + Mutterleib MK]",
+    "audio": "",
+    "translations_engl": [
+      "womb",
+      "venter"
+    ]
+  },
+  {
+    "word": "prawerīsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Prawerīsnāacc [prewerīsnan 53]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perpēsts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perpēstunpc pt pa [perpīsts 111]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sendētimai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sendītimsdat sg f [senditmai 835]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "retīweniskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Retīwenisksacc [Rettīweniskan 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "retīwingiskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Retīwingisksacc [rettīwingiskan 121]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "infarkts",
+    "paradigm": "32",
+    "gender": "masc",
+    "desc": "[Infarkt Pit]",
+    "audio": "",
+    "translations_engl": [
+      "infarct"
+    ]
+  },
+  {
+    "word": "sīfilis",
+    "paradigm": "58",
+    "gender": "fem",
+    "desc": "nom pl tantum f [Syphilis MK]",
+    "audio": "",
+    "translations_engl": [
+      "syphilis"
+    ]
+  },
+  {
+    "word": "gallan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Galsacc sg [gallan 433]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "gallans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Galsacc sg m [Gallans 65]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "mergāmans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Mērgādat sg m [Mergūmans]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "gaūwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Gaūtunpc pt ac [gauuns 89]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "engaūnja",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Engaūtunps 3 [engaunei 119]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perzūrgaui",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perzūrgautunps 3 [persurgaui 41]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagaūna",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagaūne[pogaunai 77]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagaūnimai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagaūtunps 1 sg m [pogaunimai 111]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagaūnja",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagaūtunps 3 [pogauni 113]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "labapadīngausnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Labapadīngausnaacc [labbapodingausnan 83]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "padīngausna",
+    "paradigm": "45",
+    "gender": "fem",
+    "desc": "[podingausnan 85(6) drv]",
+    "audio": "",
+    "translations_engl": [
+      "luxury (delight)"
+    ]
+  },
+  {
+    "word": "padīngausnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Padīngausnaacc [podingausnan 85(6)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagaūtai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagaūtunpc pt pa nom pl m [pogautei 113]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagaūtan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagaūtunpc pt pa acc sg [pogauton 133]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagaūtun",
+    "paradigm": "111",
+    "gender": "",
+    "desc": "[pogaūt 53]",
+    "audio": "",
+    "translations_engl": [
+      "to get",
+      "to start",
+      "to begin"
+    ]
+  },
+  {
+    "word": "pagaūwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagaūtunpc pt ac nom sg m [pogauuns 95]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grawwikaūljan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grawwi[Greiwakaulin 101]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "Ungrai",
+    "paradigm": "32",
+    "gender": "masc",
+    "desc": "nom pl tantum m  [Ungras DRV, Ungarn MK]",
+    "audio": "",
+    "translations_engl": [
+      "Hungary"
+    ]
+  },
+  {
+    "word": "engraudīs",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Engraudītweiip 2 sg [engraudīs 67]",
+    "audio": "",
+    "translations_engl": [
+      "take a pity!"
+    ]
+  },
+  {
+    "word": "grēku",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grīksdat [grīku 115]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēki si",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grēkitweips 3 r [grīkisi 55]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēiwakaūljan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krēiwakaūljan[Greiwakaulin 101 VM]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēkai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grēksnom pl m [grekoy Gr]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēkan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grēksacc sg, gen sg m [grīkan 79(15), grecon I 9]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēkans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grēksacc sg m [grīkans 37]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēkas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grēksgen sg [grīkas 117(9)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grekaūsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grekaūsnāacc [Grikausnan 67]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēkenikan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grēkeniksacc [Grīkenikan 71]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "grēkimai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grēkitweips 1 sg m [grīkimai 55]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pagānans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pagūnsacc sg m [poganans I 11]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "salūbāganan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Salūbāganaacc [Salaūbaigannan 107]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wārgans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wārgsacc sg m [wargans 53]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "zmānintun",
+    "paradigm": "85",
+    "gender": "",
+    "desc": "[smunintwey II 5]",
+    "audio": "",
+    "translations_engl": [
+      "to honour",
+      "to glorify"
+    ]
+  },
+  {
+    "word": "līndan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Līndāacc [lindan 57]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sīndants",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sindītweipc ps ac [Sindats I 9]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "īnsan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Īnssacc [īnsan 67]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makīnsei si",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makīntun siop r [mukinsusin 97(20)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sirablan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sirablsacc [Sirablan 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wīrai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wīrsnom sg m [wijrai 103(14)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wīramans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wīrsdat sg m [wijrimans 103(26)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "salūbawīrans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Salūbawīrsacc sg m [Sallūbaiwīrins 93]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sīrans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sīranacc sg m [sirans 77]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wīran",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wīrsacc sg [wijran 105(4)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sīras",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sīrangen sg [siras 95(10)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "etwērpjamai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Etwērptunps 1 sg m [etwērpimai 53]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "jūmas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Jūsdat [ioūmas 123]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "jūmans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Jūsdat [Joūmans 69]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "jūrjai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Jūrisnom sg m [Luriay E 66]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "abbejan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Abbaidat",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "būsenjans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Būsenisacc sg m [bousenniens 85]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dājans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dājāacc sg m [Dāians 45]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "majjans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Majsacc sg m [maians 37]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "rikijjans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Rikīsacc sg m [Rikijans 31]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "swajjans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Swajsacc sg m [swaians 45(13)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "twajjans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Twajsacc sg m [twaians 71(19)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wāraisjans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wāraisjaino acc pl m [Uraisins 31]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pūjati",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pūtunps 2 sg m [puietti II 11]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wijātwan",
+    "paradigm": "35",
+    "gender": "neut",
+    "desc": "[Wijātun  DRV,  vystyklas,  Windel,  Šūtwan MK]",
+    "audio": "",
+    "translations_engl": [
+      "diaper  (nappy)",
+      "nappy"
+    ]
+  },
+  {
+    "word": "Kalēndas",
+    "paradigm": "45",
+    "gender": "fem",
+    "desc": "nom pl tantum f  [kolęda, Kalėdos MK]",
+    "audio": "",
+    "translations_engl": [
+      "Christmas"
+    ]
+  },
+  {
+    "word": "kalsāi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kalsātweips 3 [kaltzā 77]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kalsīwingiskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kalsīwingisksacc [kalsīwingiskan 41]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "paskalēi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Paskalītunps 3 [paskollē 91]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "paskalēis",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Paskalītunip 2 sg [Poskuleis 91]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "lāikamai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Laikātunps 1 sg m [lāikumai 29]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "malnīkikamans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Malnīkiksdat sg m [malnijkikamans 115(8)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pāikamai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Paikītunps 1 sg m [paikemmai 29]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "palāikamai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Palaikātunps 1 sg m [polāikumai 55]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "perwekkamai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Perwektunps 1 sg m [perweckammai 29]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "waikammans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wāiksdat sg m [Waikammans 95(5)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kasacc [kan 55]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kasacc sg m [kans 65]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kānksta",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kānkstsaj nom sg f [kanxta 77]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kānkstin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kānkstēacc [Kānxtin 53]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "delīkans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Delīksacc sg m [dellīkans 65]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "dēnginiskans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dēnginisksacc sg m [Dengniskans 117]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "ka",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kasnom sg n [ka 17]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "bīskapans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Bīskapsacc sg m [Bīskopins 85]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "ēnkapts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Enkāptunpc pt pa [enkopts 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kasmu",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kasdat sg [kasmu 91]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kassin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kassiacc, ↑Kassisacc [kassin 91]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "enteikāsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Enteikāsnāacc sg [enteikūsnan 89]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "enteikāsnans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Enteikāsnāacc sg m [Enteikūsnans 85]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "teikāsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Teikāsnāacc [teikūsnan 109]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "enlāikatei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Enlaikātunps 2 sg m [enlāikuti 97]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "laikāts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Laikātunpc pt pa [laikūts 17]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "palaikāts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Palaikātunpc pt pa [polaikūts 121]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kaūlai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kaūlannom sg m [kaulei 101]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kaūlans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kaūlanacc sg m [kaūlins 101]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kāupiskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kāupiskanacc [kāupiskan 33]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "rikaūiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Rikaūtweiip 2 sg m [rikauite 107]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "wākaui",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Wūkautweips 3 [wūkawi 77]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "rikaūja",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Rikaūtweips 3 [rickawie 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krēiwakaūljan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Grawwiacc",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīrša",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kīrsa[kirscha 27(9)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīrdimai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kirdītunps 1 sg m [kīrdimai 113]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīrditi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kirdītunip 2 sg m [kīrdeiti 101]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīrkin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kīrkiacc [kirken II 9]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīrkis",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kīrkigen sg [kīrkis 17]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīrsan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kīrsa[kirschan 117(18)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīrtais",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kīrstunip 2 sg [kyrteis Gr]",
+    "audio": "",
+    "translations_engl": [
+      "strike!"
+    ]
+  },
+  {
+    "word": "kēsman",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kēsmsacc [(stan) kīsman 131]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pamilāizis",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Palāizitunip 2 sg [pomeleis Gr VM]",
+    "audio": "",
+    "translations_engl": [
+      "kiss me! kiss me a ...!"
+    ]
+  },
+  {
+    "word": "auktairikīskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Auktairikīskanacc [Aucktairikijskan 53]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "emprīkisentismu",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Emprīkisentsdat [emprīkisentismu 117]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "etskīsei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Etskītweips 2 sg [etskīsai 79]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "etskīsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Etskīsnāacc [etskīsnan 45]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "emprīkistalāi",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Emprīkistalītweips 3 [emprīkistallaē 97]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kōmpetenci",
+    "paradigm": "52",
+    "gender": "fem",
+    "desc": "[Kompetenz MK]",
+    "audio": "",
+    "translations_engl": [
+      "competence"
+    ]
+  },
+  {
+    "word": "kōmplicits",
+    "paradigm": "69",
+    "gender": "",
+    "desc": "[Kōmplicitun drv, kompliziert MK]",
+    "audio": "",
+    "translations_engl": [
+      "complicated"
+    ]
+  },
+  {
+    "word": "kōmplicitun",
+    "paradigm": "138",
+    "gender": "",
+    "desc": "[komplizieren, komplicēt MK]",
+    "audio": "",
+    "translations_engl": [
+      "to complicate"
+    ]
+  },
+  {
+    "word": "kōmputeris",
+    "paradigm": "40",
+    "gender": "masc",
+    "desc": "[computer]",
+    "audio": "",
+    "translations_engl": [
+      "computer"
+    ]
+  },
+  {
+    "word": "krikstijja",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstītunps 1 sg [Crixtia 129]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstīsenin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstīsenisacc [Crixtissennien 131]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstjānai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstjānsnom pl m [Crixtianai 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstjānans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstjānsacc pl m [Crixtiānans 73]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstjānimans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstjānsdat sg m [Crixtiānimans 123]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstjāniskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstjānisksacc sg [Crixtiāniskan 99(8)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstjāniskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstjāniskanno acc sg [Crixtiāniskun 121]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstīsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstīsnāacc [crixtisnan 59(2)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstīsnas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstīsnāgen [Crixtisnas 111]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstīti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstītunip 2 sg m [Crixteiti 59]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krikstīts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krikstītunpc pt pa [crixteits II 11]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kristu",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kristusdat [Christu 117]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kristun",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kristusacc [Christon 45]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "skrīzin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Skrīzisacc [Scrijsien 81]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "skrīzits",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Skrīzitunpc pt pa [Skrīsits 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "tikrōmai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Tikrōmsaj nom pl m [tickrōmai 63]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "tikrōmin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Tikrōmiacc sg f [tickrōmien 43(4)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "tikrōmiskan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Tikrōmisksaj acc sg [tikrōmiskan 45(13)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "tikrōmiskwan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Tikrōmiskanacc [tickrōmiskan 35]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krāujai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krāujādat [kraeuwiey II 13]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krāujan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Krāujāacc [krawian 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "sakramēntan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Sakramēntsacc [Sacramentan 77(9)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "tikran",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Tikkarsacc [tickran 119]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "krektwei",
+    "paradigm": "89",
+    "gender": "",
+    "desc": "[krekti, krešėti + krecēt + krzek MK]",
+    "audio": "",
+    "translations_engl": [
+      "to curdle",
+      "to clot"
+    ]
+  },
+  {
+    "word": "senskrempāsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Senskrempāsnāacc [senskrempūsnan 103(12)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pikullai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pikulsnom sg m [peckolle MBS]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pikullas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pikulsgen sg [pickullas 51]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pikullin",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pikulsacc sg [Pickullien 43]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kūntja",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kūnstunps 3 [kūnti 103]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "līnkuns",
+    "paradigm": "68",
+    "gender": "",
+    "desc": "pc  prēi (acc) [Līnktwei + linkęs MK]",
+    "audio": "",
+    "translations_engl": [
+      "inclined (to)"
+    ]
+  },
+  {
+    "word": "pakūnsei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pakūnstunop [pokūnsi 133]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pakūntja",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pakūnstunps 3 [pokūnti 41]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pakūntjais",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pakūnstunip 2 sg [pokuntieis 49]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pakūntuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pakūnstunpc pt ac [pokūntuns 79(14)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "ku",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kasinstr. sg n [ko(desnimma) I 15]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kūra",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kūrtunpt 3 [kūra 101]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kurpins",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kurpiacc sg m [kurpins 41]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kurtēiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kurtītweiip 2 sg m [kurteiti 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kurwan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kurwasacc sg [kurwan 89]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kāimalukei",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kāimalukitunps 3 [kāimaluke 37]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kaimīnans",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kaimīnsacc sg m [kaimīnans 53]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "prakāisnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Prakāisnāacc [prakāisnan 105]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "enkaitītai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Enkaitītweipc pt pa nom pl m [enkaitītai 73]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "lāikaiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Laikātunip 2 sg m [lāikutei 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kenna",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kīntweips",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "rekkenausnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Rekkenausnaacc [reckenausnan 89]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kīna",
+    "paradigm": "45",
+    "gender": "fem",
+    "desc": "elektriska kīna [Spannung, Kīna MK]",
+    "audio": "",
+    "translations_engl": [
+      "voltage"
+    ]
+  },
+  {
+    "word": "lānkinan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Lānkinsaj acc [Lānkinan 29]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "erkīnina",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Erkīnintunps 3 [erkīnina 117]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "izrankinna",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Izrankijja[isrankinna 61]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "kakinnais",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Kakīntunip 2 sg [kackinnais 117]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makinna",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makīntunps 3 [mukinna 49(9)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makinnaiti",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makīntunip 2 sg m [mukinaiti 59]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makinnewingins",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makinnewingisacc sg m [Makinnewingins 87(14)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makinnewingis",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makinnewis",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makinnewins",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makinnewisacc sg m [mukinnewins 89]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makinnimai",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makīntunps 1 sg m [mukinnimai 29]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makinnuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makīntunpc pt ac [mukinnons 121]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makīnsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makīnsnaacc [mukīnsnan 85]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pataukīnsnan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pataukīnsnaacc sg [potaukīsnan 95]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pataukīntan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pataukīntunpc pt pa acc [potaukinton 119]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "makīnts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Makīntunpc pt pa [mukints 49]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "pamakīnts",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Pamakīntunpc pt pa [pomukints 87]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "konsōnants",
+    "paradigm": "61",
+    "gender": "masc",
+    "desc": "[Konsonant MK]",
+    "audio": "",
+    "translations_engl": [
+      "consonant"
+    ]
+  },
+  {
+    "word": "kōntakts",
+    "paradigm": "32",
+    "gender": "masc",
+    "desc": "[Kontakt MK]",
+    "audio": "",
+    "translations_engl": [
+      "contact"
+    ]
+  },
+  {
+    "word": "kōntinents",
+    "paradigm": "56",
+    "gender": "masc",
+    "desc": "[Kontinent MK]",
+    "audio": "",
+    "translations_engl": [
+      "continent no"
+    ]
+  },
+  {
+    "word": "dēlas",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Dēlangen sg [dīlas 89]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "izdēlasenis",
+    "paradigm": "40",
+    "gender": "masc",
+    "desc": "[dirbinys, izstrādājums]",
+    "audio": "",
+    "translations_engl": [
+      "artifact",
+      "item"
+    ]
+  },
+  {
+    "word": "palēitan",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Palēitunpc pt pa n [palletan I 13]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "bilīwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Bilītunpc pt ac [billīuns 117]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "ebzentliwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Ebzentlitunpc pt ac [ebsentliuns 109]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "izlīwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Izleītunpc pt ac [islīuns 63]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "milīwuns",
+    "paradigm": "",
+    "gender": "",
+    "desc": "↑Mīlītunpc pt ac nom sg m [milijuns 103(7)]",
+    "audio": "",
+    "translations_engl": []
+  },
+  {
+    "word": "licējan",
+    "paradigm": "35a",
+    "gender": "neut",
+    "desc": "[Lyzeum]",
+    "audio": "",
+    "translations_engl": [
+      "lyceum"
+    ]
+  },
+  {
+    "word": "licēnci",
+    "paradigm": "52",
+    "gender": "fem",
+    "desc": "",
+    "audio": "",
+    "translations_engl": [
+      "licence"
+    ]
   }
 ]

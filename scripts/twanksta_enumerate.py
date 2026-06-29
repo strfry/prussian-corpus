@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup
 BASE = "https://wirdeins.twanksta.org"
 DIALECT = "semba"
 DELAY = 0.2
-RESULT_CAP = 30
+RESULT_CAP = 15
 CONCURRENCY = 4
 
 ALPHABET = sorted(set(list("abdeghijklmnoprstuwz") + ["ā", "ē", "ī", "ō", "ū", "š", "ž"]))
