@@ -36,6 +36,18 @@ Buchstabenseiten nur als Stichwort-Link (`ens_str(...)`) und lassen sich über e
 Gespeichert:
 - `raw/prusaspira/by_letter/{letter}.html` — alle Einträge pro Anfangsbuchstabe
 
+### youtube.com/@prusiskataliwidasna
+
+YouTube-Kanal mit 660+ Videos, die alle altpreußische Untertitel enthalten
+(unter der YouTube-Sprache `en` abgelegt, da YouTube kein Altpreußisch unterstützt).
+
+Scraping-Methode (`youtube_fetch.sh`): Extrahiert Videoliste aus der `playlist`-Datei
+und lädt pro Video mit `yt-dlp --write-subs --sub-lang en` die Untertitel als SRT
+herunter.
+
+Gespeichert:
+- `raw/youtube/subs/{video_id}.en.srt` — Untertitel pro Video
+
 ## Verwendung
 
 ```bash
@@ -43,6 +55,7 @@ Gespeichert:
 make enumerate    # Phase 1: Wortliste aufbauen
 make fetch        # Phase 2: Twanksta HTML cachen (Stunden)
 make prusaspira   # Prusaspira HTML cachen (Stunden)
+make youtube-fetch # YouTube-Untertitel von @prusiskataliwidasna
 
 # Fortschritt
 make status
@@ -74,7 +87,8 @@ prussian-corpus/
 ├── scripts/
 │   ├── twanksta_enumerate.py   # Phase 1: Wortliste
 │   ├── twanksta_fetch.py       # Phase 2: HTML-Cache
-│   └── prusaspira_fetch.py     # Prusaspira HTML-Cache
+│   ├── prusaspira_fetch.py     # Prusaspira HTML-Cache
+│   └── youtube_fetch.sh        # YouTube-Untertitel-Cache
 ├── state/                      # Scraping-Fortschritt (in Git)
 │   ├── twanksta_wordlist.json  # 10.698+ Lemmata
 │   ├── enumerate_state.json    # Fortschritt Phase 1
@@ -84,7 +98,9 @@ prussian-corpus/
 │   ├── twanksta/
 │   │   ├── entries/            # {word}/{lang}.html
 │   │   └── forms/              # {num}_{word}.html
-│   └── prusaspira/
-│       └── by_letter/          # {letter}.html (alle Einträge je Anfangsbuchstabe)
+│   ├── prusaspira/
+│   │   └── by_letter/          # {letter}.html (alle Einträge je Anfangsbuchstabe)
+│   └── youtube/
+│       └── subs/               # {video_id}.en.srt (Untertitel)
 └── Makefile
 ```

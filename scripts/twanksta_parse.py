@@ -191,19 +191,33 @@ def parse_adj_tables(soup):
         if degree_groups[i]:
             forms[key] = degree_groups[i]
 
-    # Adverb: find the summary table with "Adverb" in hea2 headers
+    # Adverb table: extract positive, comparative, superlative adverb forms
     for table in soup.find_all("table", id="subst"):
         hea2 = [th.get_text(strip=True) for th in table.find_all("th", class_="hea2")]
         if "Adverb" not in hea2:
             continue
-        adv_col = hea2.index("Adverb")
+        adverb = {}
+        col_map = {"positive": "Adverb", "comparative": "Comparative", "superlative": "Superlative"}
+        col_indices = {}
+        for key, label in col_map.items():
+            if label in hea2:
+                col_indices[key] = hea2.index(label)
+        if not col_indices:
+            break
         for tr in table.find_all("tr"):
             cells = tr.find_all("td")
-            if adv_col < len(cells):
-                adv_el = cells[adv_col].find(class_="verb")
-                if adv_el:
-                    forms["adverb"] = adv_el.get_text(strip=True)
-                    break
+            if not cells:
+                continue
+            any_found = False
+            for key, idx in col_indices.items():
+                if idx < len(cells):
+                    el = cells[idx].find(class_="verb")
+                    if el:
+                        adverb[key] = el.get_text(strip=True)
+                        any_found = True
+            if any_found:
+                forms["adverb"] = adverb
+                break
         break
 
     return forms

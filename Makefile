@@ -4,6 +4,7 @@ SCRIPTS = scripts
 .PHONY: twanksta-enumerate twanksta-fetch twanksta-parse twanksta-articles-parse \
         prusaspira-fetch prusaspira-parse \
         prusaspira-extended prusaspira-extended-parse \
+        youtube-fetch youtube-parse youtube-dedup \
         release status test-twanksta-enumerate test-twanksta-fetch test-prusaspira-fetch \
         test-prusaspira-extended
 
@@ -38,6 +39,18 @@ prusaspira-extended:
 # Phase 7: merge extended forms into prusaspira_entries.json
 prusaspira-extended-parse:
 	$(PYTHON) $(SCRIPTS)/prusaspira_extended_parse.py
+
+# Phase 8: download Prussian subtitles from youtube.com/@prusiskataliwadasna
+youtube-fetch:
+	./$(SCRIPTS)/youtube_fetch.sh
+
+# Phase 9: parse YouTube subtitles into structured JSON corpus
+youtube-parse:
+	$(PYTHON) $(SCRIPTS)/youtube_parse.py
+
+# Phase 10: deduplicate YouTube segments into sentence corpus
+youtube-dedup:
+	$(PYTHON) $(SCRIPTS)/youtube_dedup.py
 
 # Create a versioned release archive and upload to GitHub Releases
 release:
