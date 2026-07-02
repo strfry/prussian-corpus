@@ -5,6 +5,7 @@ SCRIPTS = scripts
         prusaspira-fetch prusaspira-parse \
         prusaspira-extended prusaspira-extended-parse \
         youtube-fetch youtube-parse youtube-dedup \
+        awizi-enumerate awizi-fetch awizi-parse \
         release status test-twanksta-enumerate test-twanksta-fetch test-prusaspira-fetch \
         test-prusaspira-extended
 
@@ -52,18 +53,42 @@ youtube-parse:
 youtube-dedup:
 	$(PYTHON) $(SCRIPTS)/youtube_dedup.py
 
+# Phase 11: enumerate all article URLs from awizi.twanksta.org sitemap
+awizi-enumerate:
+	$(PYTHON) $(SCRIPTS)/awizi_enumerate.py
+
+# Phase 12: cache raw HTML for all awizi articles
+awizi-fetch:
+	$(PYTHON) $(SCRIPTS)/awizi_fetch.py
+
+# Phase 13: parse awizi articles into structured Markdown + JSON
+awizi-parse:
+	$(PYTHON) $(SCRIPTS)/awizi_parse.py
+
 # Create a versioned release archive and upload to GitHub Releases
 release:
 	@VERSION=$$(date +v%Y-%m-%d); \
 	ARCHIVE=prussian_corpus_$${VERSION}.tar.zst; \
 	echo "Creating $$ARCHIVE..."; \
-	tar --zstd -cf $$ARCHIVE --exclude='parsed/twanksta_entries.json' --exclude='parsed/prusaspira_entries.json' parsed/; \
+	tar --zstd -cf $$ARCHIVE \
+		--exclude='parsed/twanksta_entries.json' \
+		--exclude='parsed/prusaspira_entries.json' \
+		parsed/; \
 	echo "Uploading to GitHub Releases as $$VERSION..."; \
 	gh release create $$VERSION \
 		parsed/twanksta_entries.json parsed/prusaspira_entries.json $$ARCHIVE \
 		--title "Prussian corpus parsed data $$VERSION" \
-		--notes "Parsed dictionary entries from wirdeins.twanksta.org and prusaspira.org. See README.md for details."; \
+		--notes "Parsed dictionary entries from wirdeins.twanksta.org, prusaspira.org, news/blog articles from awizi.twanksta.org, and YouTube subtitles. See README.md for details."; \
 	echo "Done: $$VERSION"
+
+# Local release archive (no GitHub upload)
+release-local:
+	@VERSION=$$(date +v%Y-%m-%d); \
+	ARCHIVE=prussian_corpus_$${VERSION}.tar.zst; \
+	echo "Creating $$ARCHIVE..."; \
+	tar --zstd -cf $$ARCHIVE \
+		parsed/; \
+	echo "Done: $$ARCHIVE ($(shell du -sh $$ARCHIVE | cut -f1))"
 
 # Status overview
 status:
@@ -71,6 +96,8 @@ status:
 	@echo "=== twanksta-fetch ===" && $(PYTHON) $(SCRIPTS)/twanksta_fetch.py --status
 	@echo "=== prusaspira-fetch ===" && $(PYTHON) $(SCRIPTS)/prusaspira_fetch.py --status
 	@echo "=== prusaspira-extended ===" && $(PYTHON) $(SCRIPTS)/prusaspira_fetch.py --extended-status
+	@echo "=== awizi-enumerate ===" && $(PYTHON) $(SCRIPTS)/awizi_enumerate.py --status
+	@echo "=== awizi-fetch ===" && $(PYTHON) $(SCRIPTS)/awizi_fetch.py --status
 
 # Quick tests
 test-twanksta-enumerate:
