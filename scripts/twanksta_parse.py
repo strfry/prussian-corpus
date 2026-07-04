@@ -46,15 +46,6 @@ def _verb_form(text):
     return val or None
 
 
-def _pcpt_type(stem):
-    """Determine participle type from twanksta stem name suffix."""
-    s = stem.lower()
-    if s.endswith(("ants", "ints", "ents")):
-        return "Present"
-    if s.endswith(("wuns", "uns")):
-        return "Past"
-    return "Passive"
-
 
 def parse_noun_cases(table):
     """Parse a declension table's rows into [{case, singular, plural}] list."""
@@ -150,15 +141,30 @@ def parse_verb_section(soup):
         if not title_el:
             continue
         stem = title_el.get_text(strip=True).lstrip("►").strip()
-        sub = el.find("table", id="subst")
-        if not sub:
+        tables = el.find_all("table", id="subst")
+        if not tables:
             continue
-        cases = parse_noun_cases(sub)
-        nom_sg = next(
-            (c.get("singular", "") for c in cases if c.get("case") == "Nominative"), ""
-        )
+        full_declension = []
+        nom_sg = ""
+        for table in tables:
+            parsed = parse_noun_table(table)
+            if parsed:
+                full_declension.extend(parsed)
+                if not nom_sg:
+                    for gender_entry in parsed:
+                        for case_entry in gender_entry.get("cases", []):
+                            if case_entry.get("case") == "Nominative":
+                                nom_sg = case_entry.get("singular", "")
+                                break
+                        if nom_sg:
+                            break
         if nom_sg:
-            participles.append({"type": _pcpt_type(stem), "form": nom_sg})
+            head = title_el.find_previous("span", class_="head")
+            pcpt_type = head.get_text(strip=True) if head else "Passive"
+            entry = {"type": pcpt_type, "form": nom_sg}
+            if full_declension:
+                entry["full_declension"] = full_declension
+            participles.append(entry)
     if participles:
         result["participles"] = participles
 
@@ -227,6 +233,8 @@ def parse_forms(html):
     """Dispatch to appropriate parser based on form HTML content."""
     if not html or not html.strip():
         return {}
+    # Fix malformed HTML: stray </td> before neut table pushes it outside spoiler-body2
+    html = re.sub(r'</td>\s*</td>', '</td>', html)
     soup = BeautifulSoup(html, "html.parser")
     is_verb = bool(soup.find("h3", string=re.compile("Indicative|Optative|Imperative|Subjunctive")))
     if is_verb:
