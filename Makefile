@@ -43,14 +43,17 @@ prusaspira-extended-parse:
 
 # Phase 8: download Prussian subtitles from youtube.com/@prusiskataliwadasna
 youtube-fetch:
-	./$(SCRIPTS)/youtube_fetch.sh
+	uvx yt-dlp --flat-playlist --print "%(id)s %(title)s"    "https://www.youtube.com/@prusiskataliwidasna/videos" > playlist
+	uv run --with yt-dlp ./$(SCRIPTS)/youtube_fetch.sh
 
 # Phase 9: parse YouTube subtitles into structured JSON corpus
 youtube-parse:
+	mkdir -p parsed
 	$(PYTHON) $(SCRIPTS)/youtube_parse.py
 
 # Phase 10: deduplicate YouTube segments into sentence corpus
 youtube-dedup:
+	mkdir -p parsed
 	$(PYTHON) $(SCRIPTS)/youtube_dedup.py
 
 # Phase 11: enumerate all article URLs from awizi.twanksta.org sitemap
