@@ -4,6 +4,7 @@ SCRIPTS = scripts
 .PHONY: twanksta-enumerate twanksta-fetch twanksta-parse twanksta-articles-parse \
         prusaspira-fetch prusaspira-parse \
         prusaspira-extended prusaspira-extended-parse \
+        annotate-links \
         youtube-fetch youtube-parse youtube-dedup \
         awizi-enumerate awizi-fetch awizi-parse \
         release status test-twanksta-enumerate test-twanksta-fetch test-prusaspira-fetch \
@@ -41,30 +42,34 @@ prusaspira-extended:
 prusaspira-extended-parse:
 	$(PYTHON) $(SCRIPTS)/prusaspira_extended_parse.py
 
-# Phase 8: download Prussian subtitles from youtube.com/@prusiskataliwadasna
+# Phase 8: add inverse linked/derived_terms fields to all parsed entries
+annotate-links:
+	$(PYTHON) $(SCRIPTS)/annotate_links.py
+
+# Phase 9: download Prussian subtitles from youtube.com/@prusiskataliwadasna
 youtube-fetch:
 	uvx yt-dlp --flat-playlist --print "%(id)s %(title)s"    "https://www.youtube.com/@prusiskataliwidasna/videos" > playlist
 	uv run --with yt-dlp ./$(SCRIPTS)/youtube_fetch.sh
 
-# Phase 9: parse YouTube subtitles into structured JSON corpus
+# Phase 10: parse YouTube subtitles into structured JSON corpus
 youtube-parse:
 	mkdir -p parsed
 	$(PYTHON) $(SCRIPTS)/youtube_parse.py
 
-# Phase 10: deduplicate YouTube segments into sentence corpus
+# Phase 11: deduplicate YouTube segments into sentence corpus
 youtube-dedup:
 	mkdir -p parsed
 	$(PYTHON) $(SCRIPTS)/youtube_dedup.py
 
-# Phase 11: enumerate all article URLs from awizi.twanksta.org sitemap
+# Phase 12: enumerate all article URLs from awizi.twanksta.org sitemap
 awizi-enumerate:
 	$(PYTHON) $(SCRIPTS)/awizi_enumerate.py
 
-# Phase 12: cache raw HTML for all awizi articles
+# Phase 13: cache raw HTML for all awizi articles
 awizi-fetch:
 	$(PYTHON) $(SCRIPTS)/awizi_fetch.py
 
-# Phase 13: parse awizi articles into structured Markdown + JSON
+# Phase 14: parse awizi articles into structured Markdown + JSON
 awizi-parse:
 	$(PYTHON) $(SCRIPTS)/awizi_parse.py
 

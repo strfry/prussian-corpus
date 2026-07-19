@@ -11,7 +11,7 @@ Output:
   parsed/twanksta_entries.json
 
 Schema per entry (mirrors prussian_dictionary.json):
-  word, paradigm, gender, desc, audio, translations, forms
+  word, paradigm, gender, desc, ref, derived_from, audio, translations, forms
 
 Usage:
   python3 scripts/twanksta_parse.py            # parse all
@@ -36,6 +36,26 @@ OUT_FILE = os.path.join(ROOT, "parsed", "twanksta_entries.json")
 BASE_URL = "https://wirdeins.twanksta.org"
 
 _VERB_TENSES = {"Present", "Past", "Perfect", "Future", "Habitual"}
+
+_LEMMA_SET = None
+_LEMMA_SET_LOWER = None
+
+_ABBREV = frozenset({
+    'MK', 'drv', 'DRV', 'E', 'Nx', 'Pit', 'VM', 'DIA', 'drv,', 'DRV,',
+    'GlN', 'I', 'ON', 'DIA,', 'Gr', 'DK', 'II', 'III', 'IV', 'V', 'VI',
+    'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'N', 'PN', 'AV', 'CONJ',
+    'PREP', 'ADV', 'PRON', 'INTERJ', 'NUM', 'Kr', 'alt', 'alt,', 'Subs',
+    'JG', 'JB', 'MBS', 'WE', 'OPN', 'GN', 'TN', 'APN', 'VT',
+    'si', 'sin',
+})
+
+
+def _get_lemma_set():
+    global _LEMMA_SET, _LEMMA_SET_LOWER
+    if _LEMMA_SET is None:
+        _LEMMA_SET = set(os.listdir(ENTRIES_DIR))
+        _LEMMA_SET_LOWER = {l.lower() for l in _LEMMA_SET}
+    return _LEMMA_SET, _LEMMA_SET_LOWER
 
 
 def _normalize_slashes(text):
@@ -248,6 +268,72 @@ def parse_forms(html):
     return {"declension": parse_noun_table(subst_tables[0])}
 
 
+def extract_desc_refs(desc_el, word):
+    if not desc_el:
+        return "", [], []
+    lemma_set, lemma_set_lower = _get_lemma_set()
+    refs = []
+    derived_from = []
+    seen = set()
+    seen_derived = set()
+
+    def add_ref(r):
+        if r not in seen:
+            seen.add(r)
+            refs.append(r)
+
+    def add_derived(r):
+        if r not in seen_derived:
+            seen_derived.add(r)
+            derived_from.append(r)
+
+    # Layer 1: refs from <a> links
+    for a in desc_el.find_all("a"):
+        ref_text = a.get_text(strip=True)
+        if ref_text.lower() != word.lower():
+            add_ref(ref_text)
+    for a in desc_el.find_all("a"):
+        a.extract()
+
+    text = desc_el.get_text(" ", strip=True)
+
+    # Layer 2: refs from non-linked ↑<text> (no space between ↑ and text)
+    def capture_up_ref(m):
+        lemma = m.group(1).strip()
+        if lemma.lower() != word.lower():
+            add_ref(lemma)
+        return ''
+    text = re.sub(r'↑(\S[^[]*?)(?=\s*\[|\s*$)', capture_up_ref, text)
+
+    # Remove orphaned ↑ left from extracted <a> links
+    text = re.sub(r'↑', ' ', text)
+
+    # Clean whitespace after removals
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'\s+([,;])', r'\1', text)
+    text = text.strip(" ,;")
+
+    # Layer 3: derived_from from [] source citations (tokens matching known lemmas)
+    for m in re.finditer(r'\[([^\]]+)\]', text):
+        content = m.group(1)
+        for t in re.split(r'[\s+]+', content):
+            t = t.strip(' ,.')
+            if not t:
+                continue
+            if t in _ABBREV:
+                continue
+            if any(c.isdigit() for c in t):
+                continue
+            if len(t) <= 1:
+                continue
+            if t.lower() == word.lower():
+                continue
+            if t in lemma_set or t.lower() in lemma_set_lower:
+                add_derived(t)
+
+    return text, refs, derived_from
+
+
 def _strip_paradigm_suffix(val, paradigm):
     if not paradigm or not isinstance(val, str):
         return val
@@ -292,11 +378,16 @@ def parse_entry_li(li):
         if t:
             translations.append(t)
 
+    word_text = word_el.get_text(strip=True)
+    desc_text, refs, derived_from = extract_desc_refs(desc_el, word_text) if desc_el else ("", [], [])
+
     return {
-        "word": word_el.get_text(strip=True),
+        "word": word_text,
         "paradigm": numb_el.get_text(strip=True) if numb_el else "",
         "gender": gend_el.get_text(strip=True) if gend_el else "",
-        "desc": desc_el.get_text(strip=True) if desc_el else "",
+        "desc": desc_text,
+        "ref": refs,
+        "derived_from": derived_from,
         "audio": BASE_URL + audio_el["src"] if audio_el and audio_el.get("src") else "",
         "translations": translations,
     }
@@ -327,7 +418,8 @@ def parse_word(word, paradigm):
     if not os.path.exists(engl_path):
         return []
 
-    bases = parse_all_li(open(engl_path, encoding="utf-8").read())
+    with open(engl_path, encoding="utf-8") as f:
+        bases = parse_all_li(f.read())
     if not bases:
         return []
 
@@ -337,7 +429,8 @@ def parse_word(word, paradigm):
         p = os.path.join(entry_dir, f"{lang}.html")
         if not os.path.exists(p):
             continue
-        other_entries = parse_all_li(open(p, encoding="utf-8").read())
+        with open(p, encoding="utf-8") as f:
+            other_entries = parse_all_li(f.read())
         for i, base in enumerate(bases):
             for other in other_entries:
                 if other["word"] == base["word"]:
@@ -350,7 +443,8 @@ def parse_word(word, paradigm):
         if base["paradigm"]:
             form_path = os.path.join(FORMS_DIR, f"{base['paradigm']}_{base['word']}.html")
             if os.path.exists(form_path):
-                forms = parse_forms(open(form_path, encoding="utf-8").read())
+                with open(form_path, encoding="utf-8") as f:
+                    forms = parse_forms(f.read())
                 forms = _clean_forms(forms, base["paradigm"])
 
         entries.append({
@@ -358,6 +452,8 @@ def parse_word(word, paradigm):
             "paradigm": base["paradigm"],
             "gender": base["gender"],
             "desc": base["desc"],
+            "ref": base["ref"],
+            "derived_from": base["derived_from"],
             "audio": base["audio"],
             "translations": translations,
             "forms": forms,
