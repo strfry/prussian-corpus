@@ -6,7 +6,7 @@ Input:  raw/prusaspira/by_letter/{a..z}.html  (23 files)
 Output: parsed/prusaspira_entries.json
 
 Schema per entry (mirrors prussian_dictionary.json):
-  word, paradigm, gender, desc, ref, derived_from, audio, translations, forms
+  word, paradigm, gender, desc, audio, translations, forms
 
 Usage:
   python3 scripts/prusaspira_parse.py           # parse all letters
@@ -350,19 +350,7 @@ def parse_letter(html, letter):
         trans_m = re.search(r"ēngliskai:\s*<b>([^<]+)</b>", chunk)
 
         source_el = s.find("font")
-        refs = []
-        if source_el:
-            refs = [a.get_text(strip=True) for a in source_el.find_all("a")]
-            for a in source_el.find_all("a"):
-                a.extract()
-            source = source_el.get_text(" ", strip=True)
-            source = re.sub(r'↑', ' ', source)
-            source = re.sub(r'\s+', ' ', source)
-            source = re.sub(r'\s+([,;])', r'\1', source)
-            source = source.strip(" ,;")
-            source = source.strip("[]")
-        else:
-            source = ""
+        source = source_el.get_text(strip=True).strip("[]") if source_el else ""
 
         table_el = s.find("table", class_="boldtable")
         raw_table_m = re.search(
@@ -377,8 +365,6 @@ def parse_letter(html, letter):
             "paradigm":     paradigm_m.group(1) if paradigm_m else "",
             "gender":       "",
             "desc":         source,
-            "ref":          refs,
-            "derived_from": [],
             "audio":        "",
             "translations": {"engl": [trans_m.group(1)]} if trans_m else {},
             "forms":        forms,
