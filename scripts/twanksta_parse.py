@@ -10,7 +10,6 @@ Input:
 Output:
   parsed/twanksta_entries.json
   state/broken_paradigms.json   — lemmas with identity-collapse declension tables
-  state/missing_ref_targets.json — refs unresolved after normalization
 
 Schema per entry (mirrors prussian_dictionary.json):
   word, paradigm, gender, desc, ref, derived_from, audio, translations, forms
@@ -58,10 +57,6 @@ def _get_lemma_set():
         _LEMMA_SET = set(os.listdir(ENTRIES_DIR))
         _LEMMA_SET_LOWER = {l.lower() for l in _LEMMA_SET}
     return _LEMMA_SET, _LEMMA_SET_LOWER
-
-
-def macron_fold(s):
-    return s.replace('ā', 'a').replace('ē', 'e').replace('ī', 'i').replace('ō', 'o').replace('ū', 'u')
 
 
 def _normalize_slashes(text):
@@ -528,42 +523,6 @@ def run(target_word=None):
         with open(os.path.join(ROOT, "state", "broken_paradigms.json"), "w", encoding="utf-8") as f:
             json.dump(broken_paradigms, f, ensure_ascii=False, indent=2)
         print(f"Wrote {len(broken_paradigms)} broken paradigms to state/broken_paradigms.json", file=sys.stderr)
-
-    # Ref normalization pass: macron/casefold resolution
-    words_exact = {e["word"] for e in entries}
-    words_lower = {w.lower() for w in words_exact}
-
-    def find_lemma(target):
-        if target in words_exact:
-            return target, "exact"
-        if target.lower() in words_lower:
-            for w in words_exact:
-                if w.lower() == target.lower():
-                    return w, "case"
-        folded = macron_fold(target).casefold()
-        hits = [w for w in words_exact if macron_fold(w).casefold() == folded]
-        if len(hits) == 1:
-            return hits[0], "macron"
-        return None, "unresolved"
-
-    missing_ref_targets = []
-    for entry in entries:
-        normalized = []
-        for ref in entry["ref"]:
-            resolved, kind = find_lemma(ref)
-            if resolved:
-                normalized.append(resolved)
-            else:
-                missing_ref_targets.append({
-                    "ref": ref,
-                    "source_word": entry["word"],
-                })
-        entry["ref"] = normalized
-
-    if missing_ref_targets:
-        with open(os.path.join(ROOT, "state", "missing_ref_targets.json"), "w", encoding="utf-8") as f:
-            json.dump(missing_ref_targets, f, ensure_ascii=False, indent=2)
-        print(f"Wrote {len(missing_ref_targets)} missing ref targets to state/missing_ref_targets.json", file=sys.stderr)
 
     with open(OUT_FILE, "w", encoding="utf-8") as f:
         json.dump(entries, f, ensure_ascii=False, indent=2)
