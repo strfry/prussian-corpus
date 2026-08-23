@@ -425,6 +425,43 @@ def parse_all_li(html):
     return entries
 
 
+def _match_homonym(base, other_entries, index, n_bases):
+    """Find the language-file entry corresponding to *base* (one search result).
+
+    Base and language-file entries are the same search results in different
+    languages; homonyms share the word form but differ in paradigm/desc.
+    Matching order (first hit wins):
+
+    1. exact: word + paradigm + desc
+    2. word + paradigm (both non-empty)
+    3. word + desc (both non-empty)
+    4. positional: same index within the result list (searches are sorted
+       identically across languages); only if both lists have the same length
+    5. None — no translation (better an empty slot than a wrong homonym)
+    """
+    for other in other_entries:
+        if (other["word"] == base["word"]
+                and other["paradigm"] == base["paradigm"]
+                and other["desc"] == base["desc"]):
+            return other
+
+    if base["paradigm"]:
+        for other in other_entries:
+            if (other["word"] == base["word"]
+                    and other["paradigm"] == base["paradigm"]):
+                return other
+
+    if base["desc"]:
+        for other in other_entries:
+            if other["word"] == base["word"] and other["desc"] == base["desc"]:
+                return other
+
+    if len(other_entries) == n_bases:
+        return other_entries[index]
+
+    return None
+
+
 def parse_word(word, paradigm):
     """Parse all cached files for one search word, return list of entry dicts.
 
@@ -446,17 +483,22 @@ def parse_word(word, paradigm):
 
     translations_per_entry = [{"engl": b.pop("translations")} for b in bases]
 
+    # Homonym-Matching: Nicht-engl-Übersetzungen müssen dem RICHTIGEN Eintrag
+    # zugeordnet werden. Gleiche Schreibweise reicht nicht (spārts: N p60,
+    # aj p26, av), sonst bekommt jeder Eintrag die Übersetzung des ersten
+    # Homonyms. Match-Reihenfolge: exakt (word+paradigm+desc) → word+paradigm
+    # → word+desc → Position (Suchergebnisse sind über Sprachen gleich sortiert).
     for lang in LANGS[1:]:
         p = os.path.join(entry_dir, f"{lang}.html")
         if not os.path.exists(p):
             continue
         with open(p, encoding="utf-8") as f:
             other_entries = parse_all_li(f.read())
+
         for i, base in enumerate(bases):
-            for other in other_entries:
-                if other["word"] == base["word"]:
-                    translations_per_entry[i][lang] = other["translations"]
-                    break
+            match = _match_homonym(base, other_entries, i, len(bases))
+            if match is not None:
+                translations_per_entry[i][lang] = match["translations"]
 
     entries = []
     for base, translations in zip(bases, translations_per_entry):
