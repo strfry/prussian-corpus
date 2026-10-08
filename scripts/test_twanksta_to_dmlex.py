@@ -5,7 +5,8 @@ Laufen auf einem festen Wort-Sample (Sekunden statt Vollauf). Zwei Gates:
        in legacy) — nichts fällt still weg.
   (3b) Serialisierungs-Roundtrip: NVH-Text → Tree → Text ist idempotent (verlustfrei).
 Plus semantische Checks (Homonym-Fix, Beleg bleibt Entry, Formen-Dump:
-paradigm als entry-Feld, inflectedForm+tag, keine examples, kein Perfekt/Futur).
+paradigm als entry-Feld, inflectedForm+tag für Verb- UND Nomen-/Adjektiv-Tabellen,
+keine examples, kein Perfekt/Futur).
 """
 import os
 import sys
@@ -23,6 +24,22 @@ SAMPLE = ["krikstjāniskan", "galbimai", "Galbtwei", "galbtwei", "Autrīmps",
 # Fixture-Verb für den Formen-Dump: aukliptun, Par. 97.
 VERB = "aukliptun"
 VERB_PARADIGM = "97"
+
+# Fixture Nomen (shape decl): krikstjāniskan, Par. 35 (neut).
+NOUN = "krikstjāniskan"
+NOUN_PARADIGM = "35"
+# Genuslose Nomen-Tabelle (Pronomen as, Par. 1): gender: "" darf keine Zellen kosten.
+GENDERLESS_NOUN = "as"
+GENDERLESS_NOUN_PARADIGM = "1"
+# Fixture Adjektiv mit allen drei Graden + Adverb (shape adj): begalbis, Par. 27.
+ADJ = "begalbis"
+ADJ_PARADIGM = "27"
+
+# Kanonische Tag-Köpfe (Giella, MAPPING §5): Verb, Nomen, Adjektiv/Adverb.
+VERB_TAG_HEADS = ("prs", "prt", "subj", "opt", "imprt", "part")
+DECL_TAG_HEADS = ("sg", "pl")
+ADJ_TAG_HEADS = ("msc", "fem", "neu", "comp", "superl", "adv")
+ALL_TAG_HEADS = VERB_TAG_HEADS + DECL_TAG_HEADS + ADJ_TAG_HEADS
 
 
 def _convert_sample():
@@ -122,11 +139,13 @@ def test_coverage_nothing_dropped():
 
 def test_key_collision_keeps_both_senses():
     """dīnkun hat zwei <li> mit IDENTISCHEM Schlüssel (word|paradigm|desc); beide
-    Sinne müssen als #0/#1 erhalten bleiben, keine Übersetzung darf verloren gehen."""
+    Sinne müssen als Homographen (dīnkun-1/dīnkun-2) erhalten bleiben, keine
+    Übersetzung darf verloren gehen (K4: lesbare NCName-IDs statt #n)."""
     out = C.build_entries(words=["dīnkun"])
     dk = [e for e in out if e["word"] == "dīnkun"]
     assert len(dk) == 2, [e["id"] for e in dk]
-    assert any(e["id"].endswith("#1") for e in dk), [e["id"] for e in dk]
+    assert {e["id"] for e in dk} == {"dīnkun-1", "dīnkun-2"}, [e["id"] for e in dk]
+    assert {e["homograph"] for e in dk} == {1, 2}, [e.get("homograph") for e in dk]
     en = {t for e in dk for t in e["translations"].get("en", [])}
     assert "thanks" in en and any("owing" in t for t in en), en
     lt = {t for e in dk for t in e["translations"].get("lt", [])}
@@ -180,17 +199,150 @@ def test_verb_inflected_forms_transcribed():
 
 def test_no_example_nodes_and_no_perfect_future_tags():
     """Keine `example`-Knoten; keine prs/prt-Tags aus Perfekt/Futur (periphrastisch,
-    werden als Konstruktion behandelt — fst/PLAN §0.9)."""
-    text, _ = _nvh_for(SAMPLE + [VERB])
+    werden als Konstruktion behandelt — fst/PLAN §0.9). Alle emittierten Tags stehen
+    im kanonischen Vokabular (Verb ∪ Nomen ∪ Adjektiv/Adverb)."""
+    text, _ = _nvh_for(SAMPLE + [VERB, NOUN, ADJ])
     assert "example" not in _node_names(text)
     forms = _if_tags(text)
     assert "aukleppa" in forms and forms["aukleppa"] == "prs.sp3"
     for tag in forms.values():
-        assert tag.split(".")[0] in ("prs", "prt", "subj", "opt", "imprt", "part"), tag
+        assert tag.split(".")[0] in ALL_TAG_HEADS, tag
     # keine Aux+Partizip-Konstruktion aus den Roh-Perfekt-/Futurzellen
     for surface in forms:
         assert not surface.startswith(("asma", "ast ", "assei", "asmai", "astei",
                                        "wīrst", "wīrstei", "wīrstmai")), surface
+    # Der Verb-Pfad emittiert ausschließlich Verb-Tags: die Nomen-/Adjektiv-Zellen
+    # dürfen nicht in die Partizip-Deklination durchschlagen (Formtabelle eines
+    # Verbs trägt `participles`, nicht `declension`).
+    assert {t.split(".")[0] for _, t in C.inflected_cells(VERB_PARADIGM, VERB)} \
+        <= set(VERB_TAG_HEADS)
+
+
+def test_numtype_from_desc_anywhere():
+    """K2: `crd`/`ord` irgendwo im desc → Eintragsfeld `numtype: card|ord` (nicht nur
+    als erstes Token: `gen asmas ord` zählt), plus Roundtrip über parse_nvh."""
+    assert C.numtype_of("ord [aīnadesimt MK]") == "ord"
+    assert C.numtype_of("gen asmas ord [Asmus 33]") == "ord"
+    assert C.numtype_of("crd [nō + jedenaście MK]") == "card"
+    assert C.numtype_of("aj n [mk]") is None
+    assert C.numtype_of("") is None
+    text, out = _nvh_for(["ainadesīmts"])
+    entry = next(e for e in out if e["word"] == "ainadesīmts")
+    assert entry["numtype"] == "ord"
+    assert f"  numtype: {entry['numtype']}" in text
+    back = {e["id"]: e for e in C.parse_nvh(text)}[entry["id"]]
+    assert back["numtype"] == "ord"
+
+
+def test_noun_declension_cells():
+    """krikstjāniskan/35 (shape decl): jede Kasus-Zeile → `sg.<case>` + `pl.<case>`,
+    in Tabellenreihenfolge. Kein Genus im Key (es ist Entry-Feld `gender:`), und
+    POS/Genus-Kontrakt bleibt unberührt."""
+    text, out = _nvh_for([NOUN])
+    entry = next(e for e in out if e["word"] == NOUN and e["paradigm"] == NOUN_PARADIGM)
+    cells = C.entry_cells(entry)
+    assert cells == [
+        (NOUN, "sg.nom"), ("krikstjaniskāi", "pl.nom"),
+        ("krikstjāniskas", "sg.gen"), (NOUN, "pl.gen"),
+        ("krikstjānisku", "sg.dat"), ("krikstjaniskammans", "pl.dat"),
+        (NOUN, "sg.acc"), ("krikstjāniskans", "pl.acc"),
+    ], cells
+    assert {t.split(".")[0] for _, t in cells} <= set(DECL_TAG_HEADS)
+    # Genus nur im Entry-Feld, nicht im Tag
+    assert entry["pos"] == "noun" and entry["gender"] == "neut"
+    assert not any(t.split(".")[0] in ADJ_TAG_HEADS for _, t in cells)
+    # eins zu eins im NVH
+    forms = _if_tags(text)
+    assert forms["krikstjaniskāi"] == "pl.nom" and forms["krikstjāniskas"] == "sg.gen"
+
+
+def test_genderless_noun_keeps_cells():
+    """Pronomen as (gender: "") trägt vollwertige Zellen — das Genus ist beim Nomen kein
+    Tag-Bestandteil und darf den Extraktor nicht blockieren."""
+    path = os.path.join(tp.FORMS_DIR, f"{GENDERLESS_NOUN_PARADIGM}_{GENDERLESS_NOUN}.html")
+    with open(path, encoding="utf-8") as f:
+        cells = C.decl_cells(tp.parse_forms(f.read()))
+    assert cells == [
+        ("as", "sg.nom"), ("mes", "pl.nom"),
+        ("māise", "sg.gen"), ("nūse", "pl.gen"),
+        ("mennei", "sg.dat"), ("nūmans", "pl.dat"),
+        ("men", "sg.acc"), ("mans", "pl.acc"),
+    ], cells
+
+
+def test_adj_cells_degrees_and_adverb():
+    """begalbis/27 (shape adj): Positiv `<g>.<n>.<c>`, Komparativ `comp.<g>.<n>.<c>`,
+    Superlativ `superl.<g>.<n>.<c>`, Adverb `adv`/`adv.comp`/`adv.superl` —
+    3×3×2×4 + 3 = 75 Zellen, Reihenfolge Genus→Numerus→Kasus."""
+    text, out = _nvh_for([ADJ])
+    entry = next(e for e in out if e["word"] == ADJ and e["paradigm"] == ADJ_PARADIGM)
+    cells = C.entry_cells(entry)
+    by_tag = {}
+    for surface, tag in cells:
+        by_tag.setdefault(tag, []).append(surface)
+    assert len(cells) == 75, len(cells)
+    assert by_tag["msc.sg.nom"] == ["begalbis"] and by_tag["fem.sg.nom"] == ["begalbi"]
+    assert by_tag["neu.sg.nom"] == ["begalbi"]
+    assert by_tag["comp.msc.sg.nom"] == ["begalbjaisis"]
+    assert by_tag["superl.msc.sg.nom"] == ["ukabegalbjaisis"]
+    assert by_tag["comp.neu.pl.acc"] == ["begalbjaisins"]
+    assert by_tag["adv"] == ["begalbjai"]
+    assert by_tag["adv.comp"] == ["begalbjais"]
+    assert by_tag["adv.superl"] == ["ukabegalbjais"]
+    # vollständiges Grid: jeder Grad trägt alle 3 Genus × 2 Numeri × 4 Kasus
+    for prefix in ("", "comp.", "superl."):
+        for g in ("msc", "fem", "neu"):
+            for n in ("sg", "pl"):
+                for c in ("nom", "gen", "dat", "acc"):
+                    assert f"{prefix}{g}.{n}.{c}" in by_tag, f"{prefix}{g}.{n}.{c}"
+    # Positiv ohne Grad-Präfix, POS bleibt bar adj, kein Genus-Feld
+    assert entry["pos"] == "adj" and entry["gender"] is None
+    forms = _if_tags(text)
+    assert forms["begalbjais"] == "adv.comp" and forms["ukabegalbjais"] == "adv.superl"
+
+
+def test_decl_cells_split_surfaces_and_skip_unknown_case(capsys):
+    """Nomen-Zellen: ' / '-Mehrfachformen je eine inflectedForm, Tabellenreihenfolge
+    singular→plural je Zeile. Unerwarteter Kasus: übersprungen + stderr-Warnung."""
+    forms = {"declension": [{"gender": "neut", "cases": [
+        {"case": "Nominative", "singular": "as / mes", "plural": "as"},
+        {"case": "Vocative", "singular": "z"},
+    ]}]}
+    assert C.decl_cells(forms, "998") == [("as", "sg.nom"), ("mes", "sg.nom"),
+                                          ("as", "pl.nom")]
+    err = capsys.readouterr().err
+    assert "Vocative" in err, err
+    # Genus wird nicht geprüft (kein Tag-Bestandteil): '' und 'm' ändern nichts
+    for gender in ("", "m", "masc"):
+        assert C.decl_cells({"declension": [{"gender": gender, "cases": [
+            {"case": "Dative", "singular": "q"}]}]}, "997") == [("q", "sg.dat")]
+
+
+def test_adj_cells_unknown_gender_skipped_and_warned(capsys):
+    """Adjektiv-Zellen: unbekanntes Genus → ganzer Genus-Block übersprungen + Warnung;
+    unerwarteter adverb-Werttyp: übersprungen + Warnung. Die Gültigkeit des Genus
+    garantiert `test_adj_gender_vocabulary_matches_noun_tables`."""
+    good = {"gender": "masc", "cases": [{"case": "Nominative", "singular": "b"}]}
+    forms = {"declension": [good, {"gender": "x", "cases": [
+        {"case": "Nominative", "singular": "qu"}]}],
+             "adverb": {"positive": "bai", "comparative": 7}}
+    assert C.adj_cells(forms, "996") == [("b", "msc.sg.nom"), ("bai", "adv")]
+    err = capsys.readouterr().err
+    assert "adj-gender 'x'" in err and "adverb-degree" in err, err
+    assert C.adj_cells({"adverb": "bais"}, "995") == []
+    assert "adverb" in capsys.readouterr().err
+
+
+def test_adj_gender_vocabulary_matches_noun_tables():
+    """Nomen- und Adjektiv-Tabelle liefern dasselbe Genus-Vokabular (masc/fem/neut) —
+    der Konverter braucht dafür keine Alias-Tabelle, sondern GENDER_SLOT direkt."""
+    with open(os.path.join(tp.FORMS_DIR, f"{ADJ_PARADIGM}_{ADJ}.html"),
+              encoding="utf-8") as f:
+        forms = tp.parse_forms(f.read())
+    for degree in ("declension", "comparative", "superlative"):
+        genders = [g["gender"] for g in forms[degree]]
+        assert genders == ["masc", "fem", "neut"], (degree, genders)
+        assert set(genders) <= set(C.GENDER_SLOT)
 
 
 def test_pos_is_bare_and_gender_is_own_field():
@@ -222,7 +374,25 @@ def test_pos_is_bare_and_gender_is_own_field():
     # Verben/Adjektive tragen kein Genus, POS bleibt bar
     assert next(e for e in out if e["word"] == "galbtwei")["pos"] == "verb"
     assert all(e["gender"] is None for e in out if e["pos"] in ("verb", "adj"))
-    assert {e["pos"] for e in out if e["pos"]} <= {"noun", "adj", "verb"}
+    # POS bleibt bar; flektierende Klassen aus der Shape, invariable aus dem desc (K3)
+    # bzw. der Hand-Tabelle (cconj/sconj/pron). Volles projekteigenes POS-Vokabular:
+    assert {e["pos"] for e in out if e["pos"]} <= {
+        "noun", "adj", "verb", "adv", "prep", "postp", "intj", "part", "num",
+        "cconj", "sconj", "pron"}
+
+
+def test_pos_desc_fallback_for_invariables():
+    """Ohne Formtabelle (leeres Paradigma) leitet pos_of die invariable Klasse aus
+    dem desc-Tag ab (K3): av→adv, prp→prep, psp→postp, ij→intj, pcl→part, crd/ord→num;
+    `encl` und ein tagloser desc → None."""
+    assert C.pos_of("", "x", "prp [über MK]") == "prep"
+    assert C.pos_of("", "x", "av [schnell]") == "adv"
+    assert C.pos_of("", "x", "psp paggan") == "postp"
+    assert C.pos_of("", "x", "ij") == "intj"
+    assert C.pos_of("", "x", "pcl") == "part"
+    assert C.pos_of("", "x", "aj n (av)") == "adv"
+    assert C.pos_of("", "x", "encl") is None
+    assert C.pos_of("", "x", "n MK") is None
 
 
 def test_parse_nvh_recovers_gender():

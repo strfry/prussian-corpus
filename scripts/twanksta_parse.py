@@ -204,7 +204,7 @@ def parse_adj_tables(soup):
         gender_text = gender_th.get_text(strip=True) if gender_th else ""
         if not gender_text:
             continue  # Skip summary/adverb tables
-        gender = gender_text[0].lower()  # m/f/n
+        gender = gender_text  # masc/fem/neut — wie parse_noun_table und das Entry-Feld
         if degree_idx >= 3:
             break
         degree_groups[degree_idx].append({"gender": gender, "cases": parse_noun_cases(table)})

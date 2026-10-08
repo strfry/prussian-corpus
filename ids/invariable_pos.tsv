@@ -1,0 +1,16 @@
+# Hand-kuratierte POS-Überschreibungen für invariable/geschlossene Klassen (K3/K5).
+# Format: id<TAB>pos   (id = K4-Entry-ID aus twanksta_ids.tsv). Überschreibt pos_of.
+#
+# UNVOLLSTÄNDIG. Der desc-Automat (pos_of) deckt av/prp/psp/ij/pcl/crd/ord ab, aber
+# NICHT Konjunktionen (koord./subord. steht nicht im desc) und ~40 Rest-/Korrektur-
+# fälle. Die vollständige Klassifikation (Subagenten-Recherche Q4) lag nur im
+# Session-Scratchpad und ist verloren → muss lexikografisch neu erarbeitet werden.
+# Hier bisher nur die im Befund namentlich verifizierten Korrekturen.
+#
+# POS-Vokabular (1:1 auf FST): cconj→+CC, sconj→+CS, cconj/sconj, part→+Pcle,
+# adv→+Adv, prep→+Pr, postp→+Po, intj→+Interj, num→+Num, pron→+Pron, noun(indecl).
+#
+# Offen (Schema-Entscheidung nötig, daher NICHT hier): enklitische Pronomenformen
+# mi/ti (= +Pron+Encl; in der NVH encl-Merkmal oder Relation zum Elternpronomen).
+ikkai	sconj
+anga	sconj

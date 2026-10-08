@@ -16,7 +16,9 @@ wiederverwendet (import), aber:
     (Plan fst §0.8): sie bleiben Einträge, wie sie in raw stehen.
   * Die Flexions-Tabellen werden als `inflectedForm`+`tag` ausgeschrieben: jede
     attestierte synthetische Einwort-Zelle, inkl. der vollen Partizip-Deklinations-
-    grids (MAPPING §2 Zeile 17 / fst/PLAN_verb_stems.md §0.7).
+    grids (MAPPING §2 Zeile 17 / fst/PLAN_verb_stems.md §0.7). Auch die Nomen- und
+    Adjektiv-/Adverb-Tabellen werden emittiert (`sg.<case>`/`pl.<case>` bzw.
+    `<g>.<n>.<c>`, `comp.*`, `superl.*`, `adv*`) — je Shape ihr Extraktor.
 
 Dumper, KEINE Morphologie: keine Stamm-/Regel-/Kompositionslogik, kein Import aus
 ../fst, keine Regularitäts- oder Vollständigkeits-Entscheidung. Perfekt/Futur
@@ -44,6 +46,17 @@ import twanksta_parse as tp  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_FILE = os.path.join(ROOT, "parsed", "twanksta_dmlex.full.nvh")
+# Eingefrorene Entry-ID-Zuordnung (K4): natürlicher Schlüssel → lesbare NCName-ID.
+# Einmal beim ersten Vollauf erzeugt, danach append-only (bestehende IDs bleiben
+# gepinnt, neue Schlüssel werden angehängt, verschwundene laut gemeldet). Liegt unter
+# dem (gitignored) corpus/-Baum; für git-Tracking genügt `!/corpus/ids/` in .gitignore.
+IDS_FILE = os.path.join(ROOT, "ids", "twanksta_ids.tsv")
+# Hand-kuratierte POS für Fälle, die der desc-Automat nicht abdeckt (K3): v. a.
+# Konjunktionen (koord./subord. unterscheidet der desc nicht) und Korrekturen am
+# Alt-Gold (Q4: `ikkai`/`anga` subordinierend; indeklinable Lehnnomen → noun). Format:
+# `id<TAB>pos` (id = die K4-Entry-ID). Überschreibt pos_of. Inhalt wird lexikografisch
+# erarbeitet; fehlt die Datei, bleibt es beim Automaten.
+HAND_POS_FILE = os.path.join(ROOT, "ids", "invariable_pos.tsv")
 
 # Site-Sprachcode → normierter IETF-Code (identisch zu dictionary/cmd/migrate langMap).
 LANG_CODE = {"engl": "en", "miks": "de", "leit": "lt",
@@ -102,6 +115,111 @@ def key_of(f) -> tuple:
     return (f["word"], f["paradigm"], f["desc_text"])
 
 
+# ── K4: lesbare, stabile Entry-IDs (NCName) statt `word|paradigm|[desc]` ──
+def slugify(word: str) -> str:
+    """Headword → NCName-tauglicher ID-Stamm. Leerzeichen → `_`, nur NCName-Zeichen
+    (Buchstaben inkl. Diakritika, Ziffern, `.`/`-`/`_`) bleiben, alles andere (`[`,
+    `]`, `|`, `:`, …) fällt weg. Diakritika werden NICHT gefaltet (ā≠a) — Faltung
+    würde Homographen erzeugen. Beginnt der Slug mit Ziffer/`.`/`-`, kommt `_` davor
+    (NCName-Startregel: Buchstabe oder `_`)."""
+    s = (word or "").strip().replace(" ", "_")
+    slug = "".join(ch for ch in s if ch == "_" or ch == "-" or ch == "." or ch.isalnum())
+    if not slug:
+        return "_"
+    if slug[0].isdigit() or slug[0] in "-.":
+        slug = "_" + slug
+    return slug
+
+
+def _natkey(f, idx: int) -> tuple:
+    """Eingefrorener Mapping-Schlüssel: natürlicher Schlüssel + Kollisionsindex."""
+    return (f["word"], f["paradigm"], f["desc_text"], idx)
+
+
+def load_id_map() -> dict:
+    """Eingefrorene natkey→id-Zuordnung aus IDS_FILE (leer, falls nicht vorhanden)."""
+    m: dict = {}
+    if not os.path.exists(IDS_FILE):
+        return m
+    with open(IDS_FILE, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.rstrip("\n")
+            if not line or line.startswith("#"):
+                continue
+            word, par, desc, idx, eid = line.split("\t")
+            m[(word, par, decode_val(desc), int(idx))] = eid
+    return m
+
+
+def save_id_map(entries: list) -> None:
+    """natkey→id append-only einfrieren: bestehende Zuordnungen bleiben unverändert,
+    neue Einträge werden angehängt. So bleibt eine einmal vergebene ID stabil."""
+    frozen = load_id_map()
+    for e in entries:
+        nk = e["_natkey"]
+        if nk not in frozen:
+            frozen[nk] = e["id"]
+    os.makedirs(os.path.dirname(IDS_FILE), exist_ok=True)
+    rows = sorted(frozen.items(), key=lambda kv: (kv[0][0], kv[0][1], kv[0][3]))
+    with open(IDS_FILE, "w", encoding="utf-8") as fh:
+        fh.write("# word\tparadigm\tdesc_text\tidx\tid  — eingefroren (K4), append-only\n")
+        for (word, par, desc, idx), eid in rows:
+            fh.write(f"{word}\t{par}\t{encode_val(desc)}\t{idx}\t{eid}\n")
+
+
+def load_hand_pos() -> dict:
+    """Hand-kuratierte id→pos-Überschreibungen (K3); leer, falls keine Datei."""
+    m: dict = {}
+    if not os.path.exists(HAND_POS_FILE):
+        return m
+    with open(HAND_POS_FILE, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.rstrip("\n")
+            if not line or line.startswith("#"):
+                continue
+            eid, pos = line.split("\t")[:2]
+            m[eid] = pos
+    return m
+
+
+def assign_ids(entries: list, report_drift: bool = False) -> list:
+    """Jedem Eintrag eine stabile ID geben. Deterministisch aus dem Headword-Slug;
+    Homographen (mehrere Einträge mit gleichem Slug) bekommen `-1`, `-2`, … in
+    Eintragsreihenfolge und ein `homograph:`-Feld. Eine eingefrorene IDS_FILE
+    überschreibt die berechnete ID (Pinning gegen Parser-Drift); verschwundene
+    eingefrorene Schlüssel werden nur beim Vollauf (report_drift) gemeldet — bei
+    Teilmengen-Läufen ist Abwesenheit kein Drift."""
+    groups: dict = {}
+    for e in entries:
+        groups.setdefault(slugify(e["word"]), []).append(e)
+    for slug, grp in groups.items():
+        if len(grp) == 1:
+            grp[0]["id"], grp[0]["homograph"] = slug, None
+        else:
+            for i, e in enumerate(grp, 1):
+                e["id"], e["homograph"] = f"{slug}-{i}", i
+    frozen = load_id_map()
+    if frozen:
+        seen = set()
+        for e in entries:
+            nk = e["_natkey"]
+            seen.add(nk)
+            if nk in frozen:
+                e["id"] = frozen[nk]
+                m = re.search(r"-(\d+)$", e["id"])
+                e["homograph"] = int(m.group(1)) if m else None
+        if report_drift:
+            for nk in sorted(set(frozen) - seen):
+                print(f"WARNING: eingefrorene ID ohne Eintrag (Parser-Drift?): "
+                      f"{nk!r} → {frozen[nk]}", file=sys.stderr)
+    hand = load_hand_pos()
+    if hand:
+        for e in entries:
+            if e["id"] in hand:
+                e["pos"] = hand[e["id"]]
+    return entries
+
+
 def _li_translations(li):
     trs = []
     tr = li.find(class_="translat")
@@ -138,14 +256,42 @@ def lang_li_map(word: str, lang: str) -> dict:
     return out
 
 
-def pos_of(paradigm: str, word: str) -> str | None:
-    """POS aus der Formtabellen-Shape (MAPPING §2 Zeile 6). Keine Tabelle → None.
-    Das POS-Feld bleibt bar: noun|adj|verb. Das Genus ist kein POS-Bestandteil,
-    es steht im eigenen `gender`-Feld (decl_gender)."""
+def numtype_of(desc_text: str) -> str | None:
+    """Nummeraltyp aus dem desc — `crd`/`ord` irgendwo im geparsten desc (nicht nur
+    das erste Token: `gen asmas ord`, `aj n (ord)` zählen mit). Feld `numtype:`
+    in der NVH; das POS bleibt separat (Q1/K2)."""
+    for tok in desc_text.split():
+        tok = tok.strip(".,()").lower()
+        if tok == "crd":
+            return "card"
+        if tok == "ord":
+            return "ord"
+    return None
+
+
+# desc-Tag → invariable/geschlossene POS (K3). Nur als Fallback, wenn es KEINE
+# Formtabelle gibt (flektierende Klassen kommen aus der Shape). Projekteigenes
+# POS-Vokabular, 1:1 auf die FST-Tags (adv→+Adv, prep→+Pr, postp→+Po, intj→+Interj,
+# part→+Pcle, num→+Num). `encl` setzt KEIN POS (Enklise ist ein Pronomen-Merkmal,
+# nicht eine Wortart). Konjunktionen (cconj/sconj) und die ~40 Rest-/Korrekturfälle
+# trägt die Hand-Tabelle invariable_pos.tsv (load_hand_pos), nicht dieser Automat.
+DESC_POS_TAG = {"av": "adv", "prp": "prep", "psp": "postp", "ij": "intj",
+                "pcl": "part", "crd": "num", "ord": "num"}
+
+
+def pos_of(paradigm: str, word: str, desc_text: str = "") -> str | None:
+    """POS aus der Formtabellen-Shape (MAPPING §2 Zeile 6); ohne Tabelle Fallback
+    auf den desc-Tag (invariable Klassen, K3). Das POS-Feld bleibt bar
+    (noun|adj|verb|adv|prep|postp|intj|part|num); Genus/Nummeraltyp stehen in eigenen
+    Feldern. Keine Tabelle und kein erkannter Tag → None (Belege/Skelette ohne POS)."""
     shape, _ = _shape_and_cells(paradigm, word)
-    if shape is None:
-        return None
-    return {"verb": "verb", "adj": "adj", "decl": "noun"}[shape]
+    if shape is not None:
+        return {"verb": "verb", "adj": "adj", "decl": "noun"}[shape]
+    for tok in desc_text.split():
+        tok = tok.strip(".,()").lower()
+        if tok in DESC_POS_TAG:
+            return DESC_POS_TAG[tok]
+    return None
 
 
 def decl_gender(paradigm: str, word: str, gender: str) -> str | None:
@@ -174,6 +320,12 @@ NUM_SLOT = {"singular": "sg", "plural": "pl"}
 CASE_SLOT = {"Nominative": "nom", "Genitive": "gen",
              "Dative": "dat", "Accusative": "acc"}
 GENDERS = ("masc", "fem", "neut")
+# Grad-Präfix der Adjektiv-Deklination: Positiv trägt kein Präfix (Giella: Nomen
+# sg./pl., Adjektiv msc.sg.nom — der Präfix steht, wo ein Grad behauptet wird).
+DEGREE_PREFIX = {"declension": "", "comparative": "comp", "superlative": "superl"}
+# Adverb-Tabelle: eine Form je Grad, keine Deklination.
+ADVERB_SLOT = {"positive": "adv", "comparative": "adv.comp",
+               "superlative": "adv.superl"}
 
 _WARNED: set = set()
 
@@ -266,6 +418,69 @@ def verb_cells(forms: dict, paradigm: str = "") -> list[tuple[str, str]]:
     return cells
 
 
+def decl_cells(forms: dict, paradigm: str = "") -> list[tuple[str, str]]:
+    """Zellen einer Nomen-Deklination (shape `decl`): je Kasus-Zeile `sg.<case>` und
+    `pl.<case>`. Das Genus ist KEIN Slot — es ist Entry-Feld (`gender:`), deshalb
+    trägt der Tag es nicht; die Genus-Blöcke werden alle durchlaufen (Einwort-Deklinatio-
+    nen haben i.d.R. einen, die adjektivische Kurzform drei).
+
+    Das Genus wird hier bewusst NICHT geprüft: es ist kein Tag-Bestandteil, und
+    genuslose Tabellen (Pronomina: `as`, `tū`, `mes`, `jūs` → gender: "") tragen
+    vollwertige Zellen. Nur der Kasus wird gemapst — unerwartete Werte: übersprungen
+    + stderr-Warnung."""
+    cells: list[tuple[str, str]] = []
+    if not forms:
+        return cells
+    for g in forms.get("declension") or []:
+        for c in g.get("cases") or []:
+            case = CASE_SLOT.get(c.get("case"))
+            if case is None:
+                _warn_once("case", c.get("case"), paradigm)
+                continue
+            for num, num_tag in NUM_SLOT.items():
+                cells += [(s, f"{num_tag}.{case}") for s in _surfaces(c.get(num) or "")]
+    return cells
+
+
+def adj_cells(forms: dict, paradigm: str = "") -> list[tuple[str, str]]:
+    """Zellen der Adjektiv-Tabelle (shape `adj`): die drei Grade über GENDER_SLOT ×
+    NUM_SLOT × CASE_SLOT — Positiv `<g>.<n>.<c>`, Komparativ `comp.<g>.<n>.<c>`,
+    Superlativ `superl.<g>.<n>.<c>` —, danach die drei Adverbformen `adv`, `adv.comp`,
+    `adv.superl`. Wie `verb_cells` ein reiner Extraktor in Tabellenreihenfolge.
+    Unerwartete Genus-/Kasus-Werte: Genus-Block bzw. Zelle übersprungen + Warnung."""
+    cells: list[tuple[str, str]] = []
+    if not forms:
+        return cells
+    for degree, prefix in DEGREE_PREFIX.items():
+        for g in forms.get(degree) or []:
+            gender = g.get("gender")
+            gender_slot = GENDER_SLOT.get(gender)
+            if gender_slot is None:
+                _warn_once("adj-gender", gender, paradigm)
+                continue
+            for c in g.get("cases") or []:
+                case = CASE_SLOT.get(c.get("case"))
+                if case is None:
+                    _warn_once("case", c.get("case"), paradigm)
+                    continue
+                for num, num_tag in NUM_SLOT.items():
+                    tag = ".".join(p for p in (prefix, gender_slot, num_tag, case) if p)
+                    cells += [(s, tag) for s in _surfaces(c.get(num) or "")]
+    adverb = forms.get("adverb")
+    if isinstance(adverb, dict):
+        for degree, tag in ADVERB_SLOT.items():
+            val = adverb.get(degree)
+            if val is None:
+                continue
+            if not isinstance(val, str):
+                _warn_once("adverb-degree", type(val).__name__, paradigm)
+                continue
+            cells += [(s, tag) for s in _surfaces(val)]
+    elif adverb is not None:
+        _warn_once("adverb", type(adverb).__name__, paradigm)
+    return cells
+
+
 _FORM_CACHE: dict = {}
 
 
@@ -301,7 +516,17 @@ def _shape_and_cells(paradigm: str, word: str):
             shape = "adj"
         elif "declension" in forms:
             shape = "adj" if _is_gendered_adj_decl(forms, paradigm) else "decl"
-    hit = (shape, verb_cells(forms, paradigm))
+    # Je Shape ihr Extraktor: Partizip-Grid nur bei Verben, Nomen-/Adjektiv-Zellen
+    # nur bei ihren Shapes (eine Adjektiv-Tabelle enthält auch `declension`).
+    if shape == "verb":
+        cells = verb_cells(forms, paradigm)
+    elif shape == "decl":
+        cells = decl_cells(forms, paradigm)
+    elif shape == "adj":
+        cells = adj_cells(forms, paradigm)
+    else:
+        cells = []
+    hit = (shape, cells)
     _FORM_CACHE[key] = hit
     return hit
 
@@ -352,23 +577,23 @@ def build_entries(words=None):
             k = key_of(f)
             idx = counter.get(k, 0)          # Vorkommen-Index für Schlüssel-Kollisionen
             counter[k] = idx + 1
-            # ID: word|paradigm|desc, plus #n bei echter Kollision (n>0)
-            eid = f'{f["word"]}|{f["paradigm"]}|{encode_val(f["desc_text"])}'
-            if idx:
-                eid += f"#{idx}"
+            # Dedup über den natürlichen Schlüssel (+Kollisionsindex); die lesbare ID
+            # wird erst nach dem Sammeln vergeben (assign_ids, K4).
+            nk = _natkey(f, idx)
             translations = {}
             for lang in tp.LANGS:
                 trs = maps[lang].get((k, idx), [])   # positionell, gleicher Index
                 if trs:
                     translations[LANG_CODE[lang]] = trs
-            if eid not in by_id:
-                by_id[eid] = {**f, "id": eid, "translations": translations,
-                              "pos": pos_of(f["paradigm"], f["word"]),
-                              "gender": decl_gender(f["paradigm"], f["word"],
-                                                    f["gender"])}
-                order.append(eid)
+            if nk not in by_id:
+                by_id[nk] = {**f, "_natkey": nk, "translations": translations,
+                             "pos": pos_of(f["paradigm"], f["word"], f["desc_text"]),
+                             "numtype": numtype_of(f["desc_text"]),
+                             "gender": decl_gender(f["paradigm"], f["word"],
+                                                   f["gender"])}
+                order.append(nk)
             else:
-                e = by_id[eid]
+                e = by_id[nk]
                 own = (f["word"] == word)   # eigenes Such-Dir ist autoritativ
                 for fld in ("audio", "article", "desc_raw"):
                     if not e[fld] and f[fld]:
@@ -379,7 +604,7 @@ def build_entries(words=None):
                     # anders reihen → sonst falscher Sinn).
                     if trs and (own or lang not in e["translations"]):
                         e["translations"][lang] = trs
-    return [by_id[k] for k in order]
+    return assign_ids([by_id[k] for k in order], report_drift=(words is None))
 
 
 import re  # noqa: E402
@@ -477,8 +702,12 @@ def nvh_lines(entries):
     for e in entries:
         L.append(f'entry: {e["word"]}')
         L.append(f'  id: {e["id"]}')
+        if e.get("homograph"):
+            L.append(f'  homograph: {e["homograph"]}')
         if e["pos"]:
             L.append(f'  pos: {e["pos"]}')
+        if e.get("numtype"):
+            L.append(f'  numtype: {e["numtype"]}')
         if e.get("gender"):
             L.append(f'  gender: {e["gender"]}')
         if e["paradigm"]:
@@ -548,16 +777,20 @@ def parse_nvh(text):
     for en in roots:                     # flache Top-Level-entry-Knoten
         if en["name"] != "entry":
             continue
-        e = {"word": en["value"], "id": "", "pos": None, "gender": None,
-             "labels": [], "translations": {}, "inflected": [], "relation": None,
-             "paradigm": "", "desc_raw": "", "article": "", "audio": "",
-             "examples": []}  # leer: example-Faltung entfernt (Plan fst §0.8)
+        e = {"word": en["value"], "id": "", "homograph": None, "pos": None,
+             "gender": None, "numtype": "", "labels": [], "translations": {},
+             "inflected": [], "relation": None, "paradigm": "", "desc_raw": "",
+             "article": "", "audio": "", "examples": []}  # example-Faltung entfernt (Plan fst §0.8)
         for c in en["children"]:
             n, v = c["name"], c["value"]
             if n == "id":
                 e["id"] = v
+            elif n == "homograph":
+                e["homograph"] = int(v) if v.isdigit() else v
             elif n == "pos":
                 e["pos"] = v
+            elif n == "numtype":
+                e["numtype"] = v
             elif n == "gender":
                 e["gender"] = v
             elif n == "paradigm":
@@ -600,6 +833,7 @@ def _paradigm_sort_key(par: str):
 
 if __name__ == "__main__":
     out, stats = convert()
+    save_id_map(out)   # K4: IDs einfrieren (append-only) nach dem Vollauf
     lines = nvh_lines(out)
     with open(OUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
@@ -610,17 +844,17 @@ if __name__ == "__main__":
           file=sys.stderr)
 
     # ── Statistik (stdout) ──
-    per_paradigm, n_verb, n_cells = collections.Counter(), 0, 0
+    per_paradigm, n_tab, n_cells = collections.Counter(), 0, 0
     for e in out:
         cells = entry_cells(e)
         if not cells:
             continue
-        n_verb += 1
+        n_tab += 1
         n_cells += len(cells)
         per_paradigm[e["paradigm"]] += len(cells)
     size = os.path.getsize(OUT_FILE)
     print(f"wrote {OUT_FILE}")
-    print(f"verb entries with form table: {n_verb}")
+    print(f"entries with form table: {n_tab}")
     print(f"inflectedForm total: {n_cells}")
     print(f"file size: {size} bytes ({size / 1e6:.2f} MB)")
     print(f"inflectedForm per paradigm ({len(per_paradigm)} paradigms):")
