@@ -1,16 +1,112 @@
 # Hand-kuratierte POS-Überschreibungen für invariable/geschlossene Klassen (K3/K5).
-# Format: id<TAB>pos   (id = K4-Entry-ID aus twanksta_ids.tsv). Überschreibt pos_of.
+# Format: id<TAB>pos  (id = K4-Entry-ID aus twanksta_ids.tsv). Überschreibt pos_of.
+# Erarbeitet 2026-10-08 aus full.nvh (Glossen + Legacy-desc), nachdem der desc-Automat
+# (av/prp/psp/ij/pcl/crd/ord) die eindeutig getaggten 361 Einträge schon abdeckt.
+# Hier: die untaggten/mehrdeutigen invariablen Lexeme. Konservativ — genuin
+# mehrdeutige Fälle bleiben absichtlich DRAUSSEN (unten als # SKIP vermerkt).
+# POS→FST: cconj→+CC sconj→+CS part→+Pcle adv→+Adv prep→+Pr postp→+Po intj→+Interj
+#          num→+Num pron→+Pron noun(indeklinabel).
 #
-# UNVOLLSTÄNDIG. Der desc-Automat (pos_of) deckt av/prp/psp/ij/pcl/crd/ord ab, aber
-# NICHT Konjunktionen (koord./subord. steht nicht im desc) und ~40 Rest-/Korrektur-
-# fälle. Die vollständige Klassifikation (Subagenten-Recherche Q4) lag nur im
-# Session-Scratchpad und ist verloren → muss lexikografisch neu erarbeitet werden.
-# Hier bisher nur die im Befund namentlich verifizierten Korrekturen.
-#
-# POS-Vokabular (1:1 auf FST): cconj→+CC, sconj→+CS, cconj/sconj, part→+Pcle,
-# adv→+Adv, prep→+Pr, postp→+Po, intj→+Interj, num→+Num, pron→+Pron, noun(indecl).
-#
-# Offen (Schema-Entscheidung nötig, daher NICHT hier): enklitische Pronomenformen
-# mi/ti (= +Pron+Encl; in der NVH encl-Merkmal oder Relation zum Elternpronomen).
-ikkai	sconj
+# ABSICHTLICH NICHT klassifiziert (Grund):
+#  - enklitische/suppletive Pronomenformen mi/ti/din/sin → brauchen encl-Schema (K5, offen)
+#  - Verb-/Partizip-/Adjektiv-FORM-Belege (aupallusis, pakwaitēits, perwaidinnas,
+#    ginīti, enwesselinsnas, falšingi, uka, madli) → attestierte Flexion, kein Lexem-POS
+#  - unklar/bound: gāncs, wissan, pagalbas, māis, stā (Demonstrativ-Form)
+
+Mālis	noun
+Mōnakō	noun
+Palau	noun
+Perū	noun
+Samōa	noun
+abbejan-1	num
+adder-1	cconj
+adder-2	cconj
+allegro	noun
 anga	sconj
+astōnsimta	num
+atpenti	adv
+autō	noun
+be-2	cconj
+beggi	sconj
+biskin	adv
+dabber	adv
+debī	noun
+deiwūtiskan-2	intj
+dekōltē	noun
+depot	noun
+dingō	noun
+dwaiwārst	adv
+dwissimta	num
+dwāinadesimt	num
+dīgi	adv
+dīnkun-1	prep
+dīnkun-2	prep
+dōsjē	noun
+ebwaitjāsnas	noun
+eršandau	adv
+etwārtai	adv
+ezteinū	adv
+gi	part
+gratis	adv
+ik	sconj
+ikkai	sconj
+ikāi	sconj
+ikāigi	sconj
+izwinandau	adv
+jā	part
+jāu	adv
+kaddan-1	sconj
+kaddan-2	sconj
+kadāi	adv
+kaīls-1	intj
+kelli	adv
+kettursimta	num
+keturwārst	adv
+kilō	noun
+kukūk	intj
+kwēi	adv
+kāi	sconj
+kāigi	sconj
+lāt	adv
+līgu-3	adv
+maigis	noun
+mazzais-1	adv
+menjū-2	noun
+mārmels	noun
+mīnus	noun
+neggi	cconj
+newīnsimta	num
+ni	part
+nijāu	adv
+nikwēi	adv
+nikwēigi	adv
+nikāi	sconj
+nū	adv
+pat	part
+penōn	noun
+plakkawingi	adv
+plūs	noun
+pēnksimta	num
+rokōko	noun
+rēzewingei	adv
+salto	noun
+septīnsimta	num
+sirzdai	prep
+sklāits-1	cconj
+spōradiskai	adv
+sēr	noun
+sōdaswundan	noun
+taksi	noun
+tataū	noun
+telli	adv
+treīsun	adv
+triwārst	adv
+trīsimta	num
+tēt-2	adv
+ussimta	num
+wiskwēi	adv
+zoō	noun
+ēntrai	prep
+ērdiw	intj
+īr	part
+Ō	intj
