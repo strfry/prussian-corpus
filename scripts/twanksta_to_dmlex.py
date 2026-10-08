@@ -269,6 +269,18 @@ def verb_cells(forms: dict, paradigm: str = "") -> list[tuple[str, str]]:
 _FORM_CACHE: dict = {}
 
 
+def _is_gendered_adj_decl(forms: dict, paradigm: str) -> bool:
+    """Adjektivisch flektierte Numeralia/Adjektive ohne Grad-Tabelle (P21–31, 68–70):
+    `declension` mit Genusblöcken m/f/n. Sie sind shape `adj` (Genus im Slot,
+    `msc.sg.nom`), nicht `decl` — sonst gehen Genus und POS verloren. Pronomina
+    (P9–20) haben dieselbe Tabellenform, bleiben aber hier unberührt (eigene POS, Q4)."""
+    m = re.match(r"\d+", paradigm or "")
+    if not m or int(m.group()) < 21:
+        return False
+    genders = {g.get("gender") for g in forms.get("declension") or []}
+    return len(genders) > 1 and genders <= set(GENDER_SLOT)
+
+
 def _shape_and_cells(paradigm: str, word: str):
     """(shape, cells) aus forms/{paradigm}_{word}.html; None/[] ohne Tabelle.
     Gecacht: die Tabelle wird pro (paradigm, word) genau einmal gelesen/geparst."""
@@ -288,7 +300,7 @@ def _shape_and_cells(paradigm: str, word: str):
         elif "comparative" in forms or "superlative" in forms or "adverb" in forms:
             shape = "adj"
         elif "declension" in forms:
-            shape = "decl"
+            shape = "adj" if _is_gendered_adj_decl(forms, paradigm) else "decl"
     hit = (shape, verb_cells(forms, paradigm))
     _FORM_CACHE[key] = hit
     return hit
