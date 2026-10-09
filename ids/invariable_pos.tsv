@@ -7,6 +7,12 @@
 # POS→FST: cconj→+CC sconj→+CS part→+Pcle adv→+Adv prep→+Pr postp→+Po intj→+Interj
 #          num→+Num pron→+Pron noun(indeklinabel).
 #
+# Auch FLEKTIERENDE Einträge dürfen hier stehen (WS2b): `assign_ids` überschreibt
+# `pos` bedingungslos, die Zellen schreibt der Dumper weiter nach der Formtabellen-
+# Shape. So tragen eraīns/niaīns (P21, pronominale Sg.Gen/Dat -asse/-asmu, wie
+# wiss/kits) `pos: pron` und abbai (P22, „beide“, Numerale nach Baltistik-Tradition,
+# vgl. lit. abu) `pos: num` — die Flexion läuft im fst über die adj-Atome.
+#
 # ABSICHTLICH NICHT klassifiziert (Grund):
 #  - enklitische/suppletive Pronomenformen mi/ti/din/sin → brauchen encl-Schema (K5, offen)
 #  - Verb-/Partizip-/Adjektiv-FORM-Belege (aupallusis, pakwaitēits, perwaidinnas,
@@ -110,3 +116,6 @@ zoō	noun
 ērdiw	intj
 īr	part
 Ō	intj
+eraīns	pron
+niaīns	pron
+abbai	num
