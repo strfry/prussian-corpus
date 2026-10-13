@@ -25,7 +25,7 @@ Dumper, KEINE Morphologie: keine Stamm-/Regel-/Kompositionslogik, kein Import au
 werden ausgelassen (rein kompositional, Konstruktion — Plan fst §0.9). Was der
 Dumper nicht kennt, überspringt er mit stderr-Warnung (nicht still).
 
-Ausgabe: die FETTE NVH nach parsed/twanksta_dmlex.full.nvh (transientes
+Ausgabe: die FETTE NVH nach parsed/twanksta.nvh (transientes
 Zwischenartefakt für den fst-Kompressor; die lean NVH schreibt fst). NVH =
 name: value, 2-Space-Einrückung. Mehrzeilige/HTML-Legacy-Werte werden reversibel
 einzeilig kodiert (\\n, \\\\), Kanonisierung siehe encode_val/decode_val.
@@ -45,7 +45,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import twanksta_parse as tp  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT_FILE = os.path.join(ROOT, "parsed", "twanksta_dmlex.full.nvh")
+OUT_FILE = os.path.join(ROOT, "parsed", "twanksta.nvh")
 # Eingefrorene Entry-ID-Zuordnung (K4): natürlicher Schlüssel → lesbare NCName-ID.
 # Einmal beim ersten Vollauf erzeugt, danach append-only (bestehende IDs bleiben
 # gepinnt, neue Schlüssel werden angehängt, verschwundene laut gemeldet). Liegt unter

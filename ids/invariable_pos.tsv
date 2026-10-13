@@ -1,6 +1,6 @@
 # Hand-kuratierte POS-Überschreibungen für invariable/geschlossene Klassen (K3/K5).
 # Format: id<TAB>pos  (id = K4-Entry-ID aus twanksta_ids.tsv). Überschreibt pos_of.
-# Erarbeitet 2026-10-08 aus full.nvh (Glossen + Legacy-desc), nachdem der desc-Automat
+# Erarbeitet 2026-10-08 aus twanksta.nvh (Glossen + Legacy-desc), nachdem der desc-Automat
 # (av/prp/psp/ij/pcl/crd/ord) die eindeutig getaggten 361 Einträge schon abdeckt.
 # Hier: die untaggten/mehrdeutigen invariablen Lexeme. Konservativ — genuin
 # mehrdeutige Fälle bleiben absichtlich DRAUSSEN (unten als # SKIP vermerkt).

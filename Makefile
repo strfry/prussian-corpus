@@ -3,7 +3,7 @@ SCRIPTS = scripts
 
 .PHONY: twanksta-enumerate twanksta-fetch twanksta-parse twanksta-articles-parse \
         prusaspira-fetch prusaspira-parse \
-        prusaspira-extended prusaspira-extended-parse \
+        prusaspira-extended prusaspira-extended-parse prusaspira-dmlex twanksta-dmlex \
         youtube-fetch youtube-parse youtube-dedup \
         awizi-enumerate awizi-fetch awizi-parse \
         release status test-twanksta-enumerate test-twanksta-fetch test-prusaspira-fetch \
@@ -29,9 +29,19 @@ twanksta-parse:
 twanksta-articles-parse:
 	$(PYTHON) $(SCRIPTS)/twanksta_articles_parse.py
 
+# Phase 4c: raw twanksta HTML → DMLex/NVH (fette NVH, Eingabe des fst-Kompressors;
+# siehe scripts/twanksta_to_dmlex.py)
+twanksta-dmlex:
+	$(PYTHON) $(SCRIPTS)/twanksta_to_dmlex.py
+
 # Phase 5: parse prusaspira HTML into structured JSON
 prusaspira-parse:
 	$(PYTHON) $(SCRIPTS)/prusaspira_parse.py
+
+# Phase 5b: standalone raw-HTML → DMLex/NVH (no twanksta coupling; siehe
+# scripts/prusaspira_to_dmlex.py + PRUSASPIRA_INVENTORY.md §8)
+prusaspira-dmlex:
+	$(PYTHON) $(SCRIPTS)/prusaspira_to_dmlex.py
 
 # Phase 6: fetch extended forms (comparative, superlative, participle declensions)
 prusaspira-extended:
@@ -76,12 +86,15 @@ release:
 	tar --zstd -cf $$ARCHIVE \
 		--exclude='parsed/twanksta_entries.json' \
 		--exclude='parsed/prusaspira_entries.json' \
+		--exclude='parsed/*.nvh' \
+		--exclude='parsed/*.bak' \
 		parsed/; \
 	echo "Uploading to GitHub Releases as $$VERSION..."; \
 	gh release create $$VERSION \
-		parsed/twanksta_entries.json parsed/prusaspira_entries.json $$ARCHIVE \
+		parsed/twanksta_entries.json parsed/prusaspira_entries.json \
+		parsed/twanksta.nvh parsed/prusaspira.nvh $$ARCHIVE \
 		--title "Prussian corpus parsed data $$VERSION" \
-		--notes "Parsed dictionary entries from wirdeins.twanksta.org, prusaspira.org, news/blog articles from awizi.twanksta.org, and YouTube subtitles. See README.md for details."; \
+		--notes "Parsed dictionary entries (twanksta_entries.json, prusaspira_entries.json) and the full NVHs (twanksta.nvh, prusaspira.nvh) from wirdeins.twanksta.org and prusaspira.org, plus article texts from awizi.twanksta.org and YouTube subtitles in the corpus archive. See README.md for details."; \
 	echo "Done: $$VERSION"
 
 # Local release archive (no GitHub upload)
@@ -90,6 +103,10 @@ release-local:
 	ARCHIVE=prussian_corpus_$${VERSION}.tar.zst; \
 	echo "Creating $$ARCHIVE..."; \
 	tar --zstd -cf $$ARCHIVE \
+		--exclude='parsed/twanksta_entries.json' \
+		--exclude='parsed/prusaspira_entries.json' \
+		--exclude='parsed/*.nvh' \
+		--exclude='parsed/*.bak' \
 		parsed/; \
 	echo "Done: $$ARCHIVE ($(shell du -sh $$ARCHIVE | cut -f1))"
 
