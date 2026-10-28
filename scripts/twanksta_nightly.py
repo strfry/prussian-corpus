@@ -265,6 +265,7 @@ class Run:
         self.writes = {}        # path -> bytes
         self.deletes = set()    # paths
         self.new, self.changed, self.empty = set(), set(), set()
+        self.redirects = {}     # vanished lemma -> lemmas the site returns for it
         self.failed = set()     # lemmas whose check could not be completed
 
     # -- refetch everything for one lemma
@@ -324,9 +325,12 @@ class Run:
         if content is None:
             self.failed.add(word)
             return
-        sig = li_signature(li_blocks(text(content)), word)
+        blocks = li_blocks(text(content))
+        sig = li_signature(blocks, word)
         if not sig:
             self.empty.add(word)
+            # the site still finds old spellings as variants of the new lemma
+            self.redirects[word] = sorted({w for w, _ in blocks})
             return
         # Compare only the lemma's own <li> blocks: the rest of the response lists
         # other lemmas that merely match the query and changes whenever they do.
@@ -403,9 +407,10 @@ class Run:
     def resolve_deletions(self, pending, today, partial):
         """Decide what disappears. Returns (gone, new_pending, renamed).
 
-        A vanished lemma that shares a bracketed source reference with a lemma
-        found new in the same run is a rename and goes at once, so git sees the
-        files move. Any other lemma is deleted only after coming back empty twice
+        A vanished lemma is a rename (or a merge into an existing lemma) and goes
+        at once, so git sees the files move, if it shares a bracketed source
+        reference with a lemma found new in the same run, or if the site answers
+        the old spelling with exactly one other lemma. Any other lemma is deleted only after coming back empty twice
         in a row. Partial (test) runs never delete and leave the pending list alone."""
         if partial:
             return set(), dict(pending), {}
@@ -415,6 +420,10 @@ class Run:
         candidates = {n: sources(text(self.current(self.store.entry_path(n, "engl")) or b""), n)
                       for n in self.new}
         renamed = pair_renames(vanished, candidates)
+        for w in fresh | (self.empty & set(pending)):
+            hits = self.redirects.get(w, [])
+            if w not in renamed and len(hits) == 1 and hits[0] != w:
+                renamed[w] = hits      # sole answer to the old spelling: renamed/merged
         gone = {w for w in self.empty if w in pending} | set(renamed)
         new_pending = {w: {"since": today} for w in fresh - set(renamed)}
         # Lemmas can share a directory (safe_filename maps "ēit?" and "ēit_" alike);

@@ -81,7 +81,7 @@ class _Store:
 
 def _run(empty, words=None, new=()):
     r = N.Run.__new__(N.Run)
-    r.store, r.empty, r.deletes, r.writes = _Store(), set(empty), set(), {}
+    r.store, r.empty, r.deletes, r.writes, r.redirects = _Store(), set(empty), set(), {}, {}
     r.words, r.new = sorted(set(words if words is not None else empty)), set(new)
     return r
 
@@ -129,7 +129,7 @@ def _check(stored, live):
     import asyncio
     r = N.Run.__new__(N.Run)
     r.store, r.client, r.lang = _FileStore(stored.encode()), _FakeClient(live.encode()), "engl"
-    r.empty, r.failed, r.marked = set(), set(), []
+    r.empty, r.failed, r.marked, r.redirects = set(), set(), [], {}
 
     async def mark(word, is_new):
         r.marked.append(word)
@@ -218,3 +218,17 @@ def test_confirmed_change_is_counted_and_written():
     r = _refetch_run(page(li("si", tr="a")), page(li("si", tr="b")))
     asyncio.run(r.mark_new_or_changed("si", is_new=False))
     assert r.changed == {"si"} and len(r.writes) == len(N.LANGUAGES)
+
+
+def test_sole_answer_to_old_spelling_is_rename():
+    r = _run({"rīksnā", "ziletti", "druška"}, words=["rīksnā", "ziletti", "druška", "rēksnā"])
+    r.redirects = {"rīksnā": ["rēksnā"], "ziletti": [], "druška": ["draška", "drūktai"]}
+    gone, pending, renamed = r.resolve_deletions({}, "2026-10-28", False)
+    assert renamed == {"rīksnā": ["rēksnā"]}
+    assert set(pending) == {"ziletti", "druška"}      # kein oder mehrdeutiger Treffer
+    assert "entries/rīksnā/engl.html" in r.deletes
+
+
+def test_check_word_records_redirect():
+    r = _check(page(li("si")), page(li("sī")))
+    assert r.empty == {"si"} and r.redirects == {"si": ["sī"]}
