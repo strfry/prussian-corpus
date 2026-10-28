@@ -281,10 +281,14 @@ class Run:
         if content is None:
             self.failed.add(word)
             return
-        if not li_signature(li_blocks(text(content)), word):
+        sig = li_signature(li_blocks(text(content)), word)
+        if not sig:
             self.empty.add(word)
             return
-        if self.store.read(self.store.entry_path(word, self.lang)) != content:
+        # Compare only the lemma's own <li> blocks: the rest of the response lists
+        # other lemmas that merely match the query and changes whenever they do.
+        stored = self.store.read(self.store.entry_path(word, self.lang))
+        if stored is None or li_signature(li_blocks(text(stored)), word) != sig:
             await self.mark_new_or_changed(word, is_new=False)
 
     async def run_lang(self, limit=None):
@@ -357,7 +361,12 @@ class Run:
             return set(), dict(pending)
         gone = {w for w in self.empty if w in pending}
         new_pending = {w: today for w in self.empty if w not in pending}
+        # Lemmas can share a directory (safe_filename maps "ēit?" and "ēit_" alike);
+        # never delete files a surviving lemma still uses.
+        live = {safe_filename(w) for w in (set(self.words) | self.new) - gone}
         for w in gone:
+            if safe_filename(w) in live:
+                continue
             for lang in LANGUAGES:
                 self.deletes.add(self.store.entry_path(w, lang))
             self.deletes.update(self.store.form_files(w))

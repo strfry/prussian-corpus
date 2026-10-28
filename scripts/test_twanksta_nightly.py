@@ -76,9 +76,10 @@ class _Store:
         return [f"forms/1_{w}.html"]
 
 
-def _run(empty):
+def _run(empty, words=None, new=()):
     r = N.Run.__new__(N.Run)
     r.store, r.empty, r.deletes = _Store(), set(empty), set()
+    r.words, r.new = sorted(set(words if words is not None else empty)), set(new)
     return r
 
 
@@ -95,3 +96,50 @@ def test_partial_run_never_deletes():
     r = _run({"a"})
     gone, pending = r.resolve_deletions({"a": "2026-10-20"}, "2026-10-28", True)
     assert gone == set() and pending == {"a": "2026-10-20"} and not r.deletes
+
+
+def test_deletion_spares_directory_shared_with_live_lemma():
+    # Juli-Wortliste hatte "ēit_", die Seite heißt "ēit?": gleicher Ordner auf der Platte.
+    r = _run({"Kāigi tebbei ēit_"}, words=["Kāigi tebbei ēit_"], new={"Kāigi tebbei ēit?"})
+    gone, _ = r.resolve_deletions({"Kāigi tebbei ēit_": "2026-10-28"}, "2026-10-29", False)
+    assert gone == {"Kāigi tebbei ēit_"}      # aus der Wortliste raus …
+    assert not r.deletes                       # … aber die Dateien bleiben
+
+
+class _FakeClient:
+    def __init__(self, content):
+        self.content = content
+
+    async def search(self, s, lang):
+        return self.content
+
+
+class _FileStore(_Store):
+    def __init__(self, stored):
+        self.stored = stored
+
+    def read(self, path):
+        return self.stored
+
+
+def _check(stored, live):
+    import asyncio
+    r = N.Run.__new__(N.Run)
+    r.store, r.client, r.lang = _FileStore(stored.encode()), _FakeClient(live.encode()), "engl"
+    r.empty, r.failed, r.marked = set(), set(), []
+
+    async def mark(word, is_new):
+        r.marked.append(word)
+    r.mark_new_or_changed = mark
+    asyncio.run(r.check_word("si"))
+    return r
+
+
+def test_check_word_ignores_other_lemmas_in_response():
+    r = _check(page(li("si"), li("sēja")), page(li("si"), li("sēja"), li("pilwi")))
+    assert r.marked == [] and not r.empty
+
+
+def test_check_word_detects_own_change_and_empty():
+    assert _check(page(li("si", tr="a")), page(li("si", tr="b"))).marked == ["si"]
+    assert _check(page(li("si")), page(li("sēsē"))).empty == {"si"}
