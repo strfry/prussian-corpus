@@ -88,7 +88,7 @@ def _run(empty, words=None, new=()):
 
 def test_deletion_needs_two_consecutive_empty_checks():
     r = _run({"a", "b"})
-    gone, pending = r.resolve_deletions({"a": "2026-10-20", "c": "2026-10-20"}, "2026-10-28", False)
+    gone, pending, _ = r.resolve_deletions({"a": "2026-10-20", "c": "2026-10-20"}, "2026-10-28", False)
     assert gone == {"a"}
     assert pending == {"b": {"since": "2026-10-28"}}   # c antwortet wieder → nicht mehr pending
     assert "entries/a/engl.html" in r.deletes and "forms/1_a.html" in r.deletes
@@ -97,14 +97,14 @@ def test_deletion_needs_two_consecutive_empty_checks():
 
 def test_partial_run_never_deletes():
     r = _run({"a"})
-    gone, pending = r.resolve_deletions({"a": "2026-10-20"}, "2026-10-28", True)
+    gone, pending, _ = r.resolve_deletions({"a": "2026-10-20"}, "2026-10-28", True)
     assert gone == set() and pending == {"a": "2026-10-20"} and not r.deletes
 
 
 def test_deletion_spares_directory_shared_with_live_lemma():
     # Juli-Wortliste hatte "ēit_", die Seite heißt "ēit?": gleicher Ordner auf der Platte.
     r = _run({"Kāigi tebbei ēit_"}, words=["Kāigi tebbei ēit_"], new={"Kāigi tebbei ēit?"})
-    gone, _ = r.resolve_deletions({"Kāigi tebbei ēit_": "2026-10-28"}, "2026-10-29", False)
+    gone, _, _ = r.resolve_deletions({"Kāigi tebbei ēit_": "2026-10-28"}, "2026-10-29", False)
     assert gone == {"Kāigi tebbei ēit_"}      # aus der Wortliste raus …
     assert not r.deletes                       # … aber die Dateien bleiben
 
@@ -162,12 +162,14 @@ def test_pair_renames_by_shared_source():
         "štīri": ["stīri"], "māisteresdēlan": ["māisterjasdēlan", "māistrjasdēlan"]}
 
 
-def test_pending_records_rename_target():
-    r = _run({"štīri"}, words=["štīri"], new={"stīri"})
+def test_rename_applies_immediately():
+    r = _run({"štīri", "rīksnā"}, words=["štīri", "rīksnā"], new={"stīri"})
     r.writes = {"entries/štīri/engl.html": page(li("štīri", desc="[sture MK]")).encode(),
                 "entries/stīri/engl.html": page(li("stīri", desc="[sture MK]")).encode()}
-    _, pending = r.resolve_deletions({}, "2026-10-28", False)
-    assert pending == {"štīri": {"since": "2026-10-28", "to": ["stīri"]}}
+    gone, pending, renamed = r.resolve_deletions({}, "2026-10-28", False)
+    assert renamed == {"štīri": ["stīri"]} and gone == {"štīri"}
+    assert pending == {"rīksnā": {"since": "2026-10-28"}}   # ohne Gegenstück: erst beim 2. Mal
+    assert "entries/štīri/engl.html" in r.deletes and "forms/1_štīri.html" in r.deletes
 
 
 class _MultiClient:

@@ -401,19 +401,22 @@ class Run:
         return self.writes[path] if path in self.writes else self.store.read(path)
 
     def resolve_deletions(self, pending, today, partial):
-        """Lemmas empty twice in a row are deleted; empty once become pending.
+        """Decide what disappears. Returns (gone, new_pending, renamed).
 
-        Partial (test) runs never delete and leave the pending list alone."""
+        A vanished lemma that shares a bracketed source reference with a lemma
+        found new in the same run is a rename and goes at once, so git sees the
+        files move. Any other lemma is deleted only after coming back empty twice
+        in a row. Partial (test) runs never delete and leave the pending list alone."""
         if partial:
-            return set(), dict(pending)
-        gone = {w for w in self.empty if w in pending}
-        new_pending = {w: {"since": today} for w in self.empty if w not in pending}
+            return set(), dict(pending), {}
+        fresh = {w for w in self.empty if w not in pending}
         vanished = {w: sources(text(self.current(self.store.entry_path(w, "engl")) or b""), w)
-                    for w in new_pending}
+                    for w in fresh}
         candidates = {n: sources(text(self.current(self.store.entry_path(n, "engl")) or b""), n)
                       for n in self.new}
-        for old, to in pair_renames(vanished, candidates).items():
-            new_pending[old]["to"] = to
+        renamed = pair_renames(vanished, candidates)
+        gone = {w for w in self.empty if w in pending} | set(renamed)
+        new_pending = {w: {"since": today} for w in fresh - set(renamed)}
         # Lemmas can share a directory (safe_filename maps "ēit?" and "ēit_" alike);
         # never delete files a surviving lemma still uses.
         live = {safe_filename(w) for w in (set(self.words) | self.new) - gone}
@@ -423,7 +426,7 @@ class Run:
             for lang in LANGUAGES:
                 self.deletes.add(self.store.entry_path(w, lang))
             self.deletes.update(self.store.form_files(w))
-        return gone, new_pending
+        return gone, new_pending, renamed
 
 
 def write_atomic(path, content):
@@ -473,7 +476,7 @@ async def main_async(args):
 
     partial = bool(args.limit or args.sweep_root)
     pending = store.pending()
-    gone, new_pending = run.resolve_deletions(pending, today, partial)
+    gone, new_pending, renamed = run.resolve_deletions(pending, today, partial)
 
     checked = max(run.checked, 1)
     problems = []
@@ -490,10 +493,11 @@ async def main_async(args):
 
     # Language-neutral block first: the wrapper uses everything up to the first
     # blank line as the commit message. Details for the mail follow.
-    renamed = {w: pending[w]["to"] for w in gone if pending[w].get("to")}
-    print(f"twanksta {lang} {today}  +{len(run.new)} ~{len(run.changed)} "
+    targets = {t for to in renamed.values() for t in to}
+    added = run.new - targets
+    print(f"twanksta {lang} {today}  +{len(added)} ~{len(run.changed)} "
           f"-{len(gone) - len(renamed)} >{len(renamed)}")
-    for sign, items in (("+", run.new), ("~", run.changed), ("-", gone - set(renamed))):
+    for sign, items in (("+", added), ("~", run.changed), ("-", gone - set(renamed))):
         if items:
             print(f"{sign} " + ", ".join(sorted(items)))
     if renamed:
@@ -504,9 +508,7 @@ async def main_async(args):
         print(f"  sweep fallback single queries: {run.fallback}")
     fresh = sorted(set(new_pending) - set(pending))
     if fresh:
-        print("  empty once (pending deletion): " + ", ".join(
-            w + (f" (→ {' | '.join(new_pending[w]['to'])})" if new_pending[w].get("to") else "")
-            for w in fresh))
+        print("  empty once (pending deletion): " + ", ".join(fresh))
     print(f"  files: {len(run.writes)} written, {len(run.deletes)} deleted")
 
     last = dict(rotation.get("last_verified", {}))
