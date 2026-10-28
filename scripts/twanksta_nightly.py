@@ -121,6 +121,24 @@ def pair_renames(vanished, candidates):
     return pairs
 
 
+def edit_distance(a, b):
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        prev = cur
+    return prev[-1]
+
+
+def typo_fix(old, candidates):
+    """The one candidate within a typo's reach of old (normalized), else None."""
+    n = norm(old)
+    limit = 2 if len(n) >= 8 else 1
+    close = [c for c in candidates if edit_distance(n, norm(c)) <= limit]
+    return close[0] if len(close) == 1 else None
+
+
 def form_keys(html, word):
     """{(numb, desc)} of the lemma's entries that have a paradigm table."""
     soup = BeautifulSoup(html, "html.parser")
@@ -409,8 +427,9 @@ class Run:
 
         A vanished lemma is a rename (or a merge into an existing lemma) and goes
         at once, so git sees the files move, if it shares a bracketed source
-        reference with a lemma found new in the same run, or if the site answers
-        the old spelling with exactly one other lemma. Any other lemma is deleted only after coming back empty twice
+        reference with a lemma found new in the same run, if the site answers
+        the old spelling with exactly one other lemma, or if exactly one new lemma
+        is a typo's distance away. Any other lemma is deleted only after coming back empty twice
         in a row. Partial (test) runs never delete and leave the pending list alone."""
         if partial:
             return set(), dict(pending), {}
@@ -424,6 +443,10 @@ class Run:
             hits = self.redirects.get(w, [])
             if w not in renamed and len(hits) == 1 and hits[0] != w:
                 renamed[w] = hits      # sole answer to the old spelling: renamed/merged
+        for w in fresh - set(renamed):
+            fix = typo_fix(w, self.new)
+            if fix:
+                renamed[w] = [fix]     # corrected typo (elekrāina → elektrāina)
         gone = {w for w in self.empty if w in pending} | set(renamed)
         new_pending = {w: {"since": today} for w in fresh - set(renamed)}
         # Lemmas can share a directory (safe_filename maps "ēit?" and "ēit_" alike);

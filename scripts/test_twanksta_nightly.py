@@ -232,3 +232,17 @@ def test_sole_answer_to_old_spelling_is_rename():
 def test_check_word_records_redirect():
     r = _check(page(li("si")), page(li("sī")))
     assert r.empty == {"si"} and r.redirects == {"si": ["sī"]}
+
+
+def test_typo_fix_unique_and_close():
+    assert N.typo_fix("elekrāina", {"elektrāina", "enmērisna"}) == "elektrāina"
+    assert N.typo_fix("ziletti", {"pilwi", "zēbri"}) is None
+    assert N.typo_fix("kāi", {"kai", "kāis"}) is None          # mehrdeutig
+    assert N.typo_fix("as", {"ast"}) == "ast"
+
+
+def test_typo_rule_only_against_new_lemmas():
+    r = _run({"elekrāina", "matiskērmens"}, words=["elekrāina", "matiskērmens", "materiskērmens"],
+             new={"elektrāina"})
+    gone, pending, renamed = r.resolve_deletions({}, "2026-10-28", False)
+    assert renamed == {"elekrāina": ["elektrāina"]} and set(pending) == {"matiskērmens"}
