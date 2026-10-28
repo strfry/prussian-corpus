@@ -20,7 +20,7 @@ Gespeichert:
 
 Nächtlicher Abgleich (`twanksta_nightly.py`, Cron-Wrapper `twanksta_nightly.sh`):
 `raw/twanksta` ist ein Symlink auf `../../wirdeins/twanksta` im Daten-Repo
-[prussian-wirdeins](https://github.com/strfry/prussian-wirdeins). Jede Nacht wird der ganze
+[wirdeins](https://github.com/strfry/wirdeins). Jede Nacht wird der ganze
 Wortschatz in einer Sprache geprüft (Rotation engl → miks → leit → latt → pols → mask;
 die engl-Nacht ist ein Präfix-Sweep, der auch neue Lemmata findet). Geänderte oder
 neue Lemmata werden in allen Sprachen samt Formtabelle neu geholt, das Ergebnis wird

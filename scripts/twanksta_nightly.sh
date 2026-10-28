@@ -2,7 +2,7 @@
 # Nightly cron wrapper for twanksta_nightly.py.
 #
 # raw/twanksta must lie inside a git checkout of the data repo, on a branch
-# (prussian-wirdeins; raw/twanksta is a symlink to ../../wirdeins/twanksta). Only that directory is checked, staged and committed,
+# (strfry/wirdeins; raw/twanksta is a symlink to ../../wirdeins/twanksta). Only that directory is checked, staged and committed,
 # so the data repo can hold other things too. Commits only when the run succeeded
 # and changed something; rebases onto and pushes to the remote if there is one.
 # Everything goes to stdout so cron's MAILTO delivers it.
