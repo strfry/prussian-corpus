@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Nightly cron wrapper for twanksta_nightly.py.
 #
-# raw/twanksta must lie inside a git checkout of the data repo (e.g. a symlink
-# to <data repo>/twanksta). Only that directory is checked, staged and committed,
+# raw/twanksta must lie inside a git checkout of the data repo, on a branch
+# (prussian-wirdeins; raw/twanksta is a symlink to ../../wirdeins/twanksta). Only that directory is checked, staged and committed,
 # so the data repo can hold other things too. Commits only when the run succeeded
 # and changed something; rebases onto and pushes to the remote if there is one.
 # Everything goes to stdout so cron's MAILTO delivers it.
@@ -22,6 +22,10 @@ exec 9>"$RUNDIR/twanksta_nightly.lock"
 flock -n 9 || { echo "twanksta nightly: previous run still active, skipping"; exit 0; }
 
 cd "$RAW"
+if ! git symbolic-ref -q HEAD >/dev/null; then
+    echo "twanksta nightly: data repo is on a detached HEAD (make sync?), refusing to run"
+    exit 1
+fi
 if [ -n "$(git status --porcelain -- .)" ]; then
     echo "twanksta nightly: $RAW has uncommitted changes, refusing to run"
     git status --short -- . | head -20
