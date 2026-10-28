@@ -1,0 +1,97 @@
+"""Tests für den nächtlichen Twanksta-Abgleich (corpus/scripts/twanksta_nightly.py).
+
+Offline, auf kleinen HTML-Schnipseln im Format von /search/. Geprüft werden die
+Stellen, an denen ein Fehler still Änderungen verschlucken würde: Cap-Erkennung
+des Präfix-Sweeps, Homonym-Signatur, Formtabellen-Schlüssel, Löschregel.
+"""
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import twanksta_nightly as N  # noqa: E402
+
+
+def li(word, numb=None, desc="", tr="x"):
+    numb_html = f" <span class='numb'>{numb}</span>" if numb else ""
+    return (f"<li><span class='word'>{word}</span>{numb_html}  <span class='desc'>{desc}</span>"
+            f"<span class=\"translat\"><span class='translation-child'>"
+            f"<span class='translation-number'>1</span> {tr}</span></span></li>")
+
+
+def page(*lis):
+    return "﻿   <ul>" + "".join(lis) + "</ul>"
+
+
+def test_norm_matches_site_insensitivity():
+    assert N.norm("Dēiws") == N.norm("deiws") == "deiws"
+    assert N.norm("šlāuksnaszaks").startswith("slauk")
+
+
+def test_is_complete_counts_only_prefix_hits():
+    # 9 Präfix-Treffer + beliebig viele Übersetzungs-/Teilstring-Treffer: vollständig
+    hits = [li(f"ab{i}") for i in range(9)] + [li(f"x{i}ab") for i in range(30)]
+    assert N.is_complete(N.li_blocks(page(*hits)), "ab")
+    # 10 Präfix-Treffer: Cap erreicht, muss gesplittet werden
+    hits.append(li("abz"))
+    assert not N.is_complete(N.li_blocks(page(*hits)), "ab")
+
+
+def test_is_complete_uses_site_normalization():
+    hits = [li(f"Āb{i}") for i in range(10)]
+    assert not N.is_complete(N.li_blocks(page(*hits)), "ab")
+
+
+def test_li_signature_order_independent_and_homonym_complete():
+    a, b = li("spārts", "60", "N"), li("spārts", "26", "aj")
+    other = li("spārtiskan")
+    assert N.li_signature(N.li_blocks(page(a, other, b)), "spārts") == \
+        N.li_signature(N.li_blocks(page(b, a)), "spārts")
+    # ein fehlendes Homonym ist eine Änderung
+    assert N.li_signature(N.li_blocks(page(a)), "spārts") != \
+        N.li_signature(N.li_blocks(page(a, b)), "spārts")
+
+
+def test_li_signature_detects_desc_edit():
+    old = page(li("abbejan", desc='↑ <a href="#abbai">Abbai</a> dat'))
+    new = page(li("abbejan", desc='↑ <a href="#abbai">Abbai</a> gen'))
+    assert N.li_signature(N.li_blocks(old), "abbejan") != N.li_signature(N.li_blocks(new), "abbejan")
+
+
+def test_form_keys_only_own_entries_with_paradigm():
+    html = page(li("as", "1"), li("as"), li("asman", "35"))
+    assert N.form_keys(html, "as") == {("1", "")}
+
+
+def test_follow_chars_excludes_wildcards_and_allows_space():
+    f = N.follow_chars(["ab_c", "Ād"])
+    assert f[""] == {"a"}
+    assert "_" not in f["b"] and " " in f["a"] and "d" in f["a"]
+
+
+class _Store:
+    def entry_path(self, w, lang):
+        return f"entries/{w}/{lang}.html"
+
+    def form_files(self, w):
+        return [f"forms/1_{w}.html"]
+
+
+def _run(empty):
+    r = N.Run.__new__(N.Run)
+    r.store, r.empty, r.deletes = _Store(), set(empty), set()
+    return r
+
+
+def test_deletion_needs_two_consecutive_empty_checks():
+    r = _run({"a", "b"})
+    gone, pending = r.resolve_deletions({"a": "2026-10-20", "c": "2026-10-20"}, "2026-10-28", False)
+    assert gone == {"a"}
+    assert pending == {"b": "2026-10-28"}          # c antwortet wieder → nicht mehr pending
+    assert "entries/a/engl.html" in r.deletes and "forms/1_a.html" in r.deletes
+    assert not any("/b/" in p for p in r.deletes)
+
+
+def test_partial_run_never_deletes():
+    r = _run({"a"})
+    gone, pending = r.resolve_deletions({"a": "2026-10-20"}, "2026-10-28", True)
+    assert gone == set() and pending == {"a": "2026-10-20"} and not r.deletes

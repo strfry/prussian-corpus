@@ -18,6 +18,22 @@ Gespeichert:
 - `raw/twanksta/entries/{word}/{lang}.html` — Such-Antwort pro Wort und Sprache
 - `raw/twanksta/forms/{num}_{word}.html` — Paradigmentabelle pro Lemma
 
+Nächtlicher Abgleich (`twanksta_nightly.py`, Cron-Wrapper `twanksta_nightly.sh`):
+`raw/twanksta` ist ein Clone eines eigenen Daten-Repos. Jede Nacht wird der ganze
+Wortschatz in einer Sprache geprüft (Rotation engl → miks → leit → latt → pols → mask;
+die engl-Nacht ist ein Präfix-Sweep, der auch neue Lemmata findet). Geänderte oder
+neue Lemmata werden in allen Sprachen samt Formtabelle neu geholt, das Ergebnis wird
+committet. `git log -p` im Daten-Repo ist damit das Änderungsprotokoll. Zustand
+(Wortliste, Rotation, Löschkandidaten) liegt in `raw/twanksta/state/`.
+
+Verhalten der Seite, auf dem das beruht (gemessen 2026-10-28): Antworten sind
+byte-deterministisch; `%`/`_` werden als SQL-LIKE durchgereicht; die Präfix-Stufe
+liefert höchstens 10 Lemmata (daher Split ab 10 Präfix-Treffern, ≈15 000 Requests
+für den vollen Sweep); Einzel-Abfragen liefern fast nur das Lemma selbst und
+entdecken keine neuen Lemmata. Es gibt kein Änderungssignal (keine aktuelle Sitemap,
+kein ETag/Last-Modified). Formtabellen werden aus den Stämmen generiert und daher nur
+bei geänderten Lemmata neu geholt.
+
 ### prusaspira.org
 
 Inflektionstabellen für altpreußische Wörter (prusaspira.org/wirdeins). Betrieben von

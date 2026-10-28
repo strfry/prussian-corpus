@@ -6,6 +6,7 @@ SCRIPTS = scripts
         prusaspira-extended prusaspira-extended-parse prusaspira-dmlex twanksta-dmlex \
         youtube-fetch youtube-parse youtube-dedup \
         awizi-enumerate awizi-fetch awizi-parse \
+        twanksta-nightly test-twanksta-nightly \
         release status test-twanksta-enumerate test-twanksta-fetch test-prusaspira-fetch \
         test-prusaspira-extended
 
@@ -16,6 +17,14 @@ twanksta-enumerate:
 # Phase 2: cache raw HTML for all twanksta words (entries + form tables)
 twanksta-fetch:
 	$(PYTHON) $(SCRIPTS)/twanksta_fetch.py
+
+# Nightly incremental refresh of raw/twanksta, one language per night
+# (cron: scripts/twanksta_nightly.sh)
+twanksta-nightly:
+	$(PYTHON) $(SCRIPTS)/twanksta_nightly.py
+
+test-twanksta-nightly:
+	$(PYTHON) -m pytest -q $(SCRIPTS)/test_twanksta_nightly.py
 
 # Phase 3: cache raw HTML from prusaspira.org by letter
 prusaspira-fetch:
@@ -114,6 +123,7 @@ release-local:
 status:
 	@echo "=== twanksta-enumerate ===" && $(PYTHON) $(SCRIPTS)/twanksta_enumerate.py --status
 	@echo "=== twanksta-fetch ===" && $(PYTHON) $(SCRIPTS)/twanksta_fetch.py --status
+	@echo "=== twanksta-nightly ===" && $(PYTHON) $(SCRIPTS)/twanksta_nightly.py --status
 	@echo "=== prusaspira-fetch ===" && $(PYTHON) $(SCRIPTS)/prusaspira_fetch.py --status
 	@echo "=== prusaspira-extended ===" && $(PYTHON) $(SCRIPTS)/prusaspira_fetch.py --extended-status
 	@echo "=== awizi-enumerate ===" && $(PYTHON) $(SCRIPTS)/awizi_enumerate.py --status
