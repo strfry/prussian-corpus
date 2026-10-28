@@ -45,7 +45,8 @@ git add -A -- .
 if git diff --cached --quiet -- .; then
     exit 0
 fi
-git commit -q -m "$(head -1 <<<"$summary")" -m "$(tail -n +2 <<<"$summary")" -- .
+# commit message = the language-neutral block before the first blank line
+git commit -q -m "$(sed '/^$/q' <<<"$summary" | sed '/^$/d')" -- .
 if git remote | grep -q .; then
     git pull -q --rebase
     git push -q

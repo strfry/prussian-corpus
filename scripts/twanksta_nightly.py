@@ -426,14 +426,18 @@ async def main_async(args):
     words = sorted((set(run.words) | run.new) - gone)
     minutes = (time.monotonic() - t0) / 60
 
-    print(f"twanksta {lang} {today}: {run.checked} lemmas checked, {client.requests} requests, "
-          f"{minutes:.0f} min")
+    # Language-neutral block first: the wrapper uses everything up to the first
+    # blank line as the commit message. Details for the mail follow.
+    print(f"twanksta {lang} {today}  +{len(run.new)} ~{len(run.changed)} -{len(gone)}")
+    for sign, items in (("+", run.new), ("~", run.changed), ("-", gone)):
+        if items:
+            print(f"{sign} " + ", ".join(sorted(items)))
+    print()
+    print(f"{run.checked} lemmas checked, {client.requests} requests, {minutes:.0f} min")
     if lang == "engl":
         print(f"  sweep fallback single queries: {run.fallback}")
-    for label, items in (("new", run.new), ("changed", run.changed),
-                         ("deleted", gone), ("empty once (pending)", set(new_pending) - set(pending))):
-        if items:
-            print(f"  {label} ({len(items)}): " + ", ".join(sorted(items)))
+    if set(new_pending) - set(pending):
+        print("  empty once (pending deletion): " + ", ".join(sorted(set(new_pending) - set(pending))))
     print(f"  files: {len(run.writes)} written, {len(run.deletes)} deleted")
 
     last = dict(rotation.get("last_verified", {}))
