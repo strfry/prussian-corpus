@@ -168,3 +168,51 @@ def test_pending_records_rename_target():
                 "entries/stīri/engl.html": page(li("stīri", desc="[sture MK]")).encode()}
     _, pending = r.resolve_deletions({}, "2026-10-28", False)
     assert pending == {"štīri": {"since": "2026-10-28", "to": ["stīri"]}}
+
+
+class _MultiClient:
+    def __init__(self, by_lang, form=b"<table/>"):
+        self.by_lang, self.form = by_lang, form
+
+    async def search(self, s, lang):
+        return self.by_lang[lang]
+
+    async def more(self, word, numb, desc):
+        return self.form
+
+
+class _DictStore(_Store):
+    def __init__(self, files):
+        self.files = files
+
+    def read(self, path):
+        return self.files.get(path)
+
+    def form_path(self, w, numb):
+        return f"forms/{numb}_{w}.html"
+
+    def form_files(self, w):
+        return [p for p in self.files if p.startswith("forms/") and p.endswith(f"_{w}.html")]
+
+
+def _refetch_run(stored_html, live_html):
+    r = N.Run.__new__(N.Run)
+    files = {f"entries/si/{l}.html": stored_html.encode() for l in N.LANGUAGES}
+    r.store = _DictStore(files)
+    r.client = _MultiClient({l: live_html.encode() for l in N.LANGUAGES})
+    r.writes, r.deletes, r.failed, r.new, r.changed = {}, set(), set(), set(), set()
+    return r
+
+
+def test_unconfirmed_change_is_not_counted_and_noise_not_written():
+    import asyncio
+    r = _refetch_run(page(li("si"), li("sēja")), page(li("si"), li("sēja"), li("pilwi")))
+    asyncio.run(r.mark_new_or_changed("si", is_new=False))
+    assert r.changed == set() and r.writes == {}
+
+
+def test_confirmed_change_is_counted_and_written():
+    import asyncio
+    r = _refetch_run(page(li("si", tr="a")), page(li("si", tr="b")))
+    asyncio.run(r.mark_new_or_changed("si", is_new=False))
+    assert r.changed == {"si"} and len(r.writes) == len(N.LANGUAGES)

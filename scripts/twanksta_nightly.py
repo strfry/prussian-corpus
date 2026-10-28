@@ -270,15 +270,23 @@ class Run:
     # -- refetch everything for one lemma
 
     async def refetch_lemma(self, word):
+        """Refetch all languages + form tables; return True if anything of the lemma changed.
+
+        A language file is only rewritten when the lemma's own <li> blocks differ,
+        so other lemmas listed in the same response never produce a diff."""
         results = await asyncio.gather(*[self.client.search(word, l) for l in LANGUAGES])
         if any(r is None for r in results):
             self.failed.add(word)
-            return
+            return False
+        touched = False
         engl = None
         for lang, content in zip(LANGUAGES, results):
             path = self.store.entry_path(word, lang)
-            if self.store.read(path) != content:
+            stored = self.store.read(path)
+            if stored is None or li_signature(li_blocks(text(stored)), word) != \
+                    li_signature(li_blocks(text(content)), word):
                 self.writes[path] = content
+                touched = True
             if lang == "engl":
                 engl = content
         keys = form_keys(text(engl), word)
@@ -294,13 +302,20 @@ class Run:
                 continue
             if self.store.read(path) != content:
                 self.writes[path] = content
+                touched = True
         for path in self.store.form_files(word):
             if path not in keep:
                 self.deletes.add(path)
+                touched = True
+        return touched
 
     async def mark_new_or_changed(self, word, is_new):
-        (self.new if is_new else self.changed).add(word)
-        await self.refetch_lemma(word)
+        if is_new:
+            self.new.add(word)
+            await self.refetch_lemma(word)
+        elif await self.refetch_lemma(word):
+            # only count changes the refetch confirms (guards against odd one-off answers)
+            self.changed.add(word)
 
     # -- non-engl night
 
