@@ -69,6 +69,9 @@ def test_follow_chars_excludes_wildcards_and_allows_space():
 
 
 class _Store:
+    def read(self, path):
+        return None
+
     def entry_path(self, w, lang):
         return f"entries/{w}/{lang}.html"
 
@@ -78,7 +81,7 @@ class _Store:
 
 def _run(empty, words=None, new=()):
     r = N.Run.__new__(N.Run)
-    r.store, r.empty, r.deletes = _Store(), set(empty), set()
+    r.store, r.empty, r.deletes, r.writes = _Store(), set(empty), set(), {}
     r.words, r.new = sorted(set(words if words is not None else empty)), set(new)
     return r
 
@@ -87,7 +90,7 @@ def test_deletion_needs_two_consecutive_empty_checks():
     r = _run({"a", "b"})
     gone, pending = r.resolve_deletions({"a": "2026-10-20", "c": "2026-10-20"}, "2026-10-28", False)
     assert gone == {"a"}
-    assert pending == {"b": "2026-10-28"}          # c antwortet wieder → nicht mehr pending
+    assert pending == {"b": {"since": "2026-10-28"}}   # c antwortet wieder → nicht mehr pending
     assert "entries/a/engl.html" in r.deletes and "forms/1_a.html" in r.deletes
     assert not any("/b/" in p for p in r.deletes)
 
@@ -143,3 +146,25 @@ def test_check_word_ignores_other_lemmas_in_response():
 def test_check_word_detects_own_change_and_empty():
     assert _check(page(li("si", tr="a")), page(li("si", tr="b"))).marked == ["si"]
     assert _check(page(li("si")), page(li("sēsē"))).empty == {"si"}
+
+
+def test_sources_only_bracketed_part():
+    html = page(li("saldiskāi", desc="NOM PL N [Salds DRV, Süßigkeiten MK]"), li("x", desc="[y]"))
+    assert N.sources(html, "saldiskāi") == {"[Salds DRV, Süßigkeiten MK]"}
+
+
+def test_pair_renames_by_shared_source():
+    vanished = {"štīri": {"[sture MK]"}, "māisteresdēlan": {"[Maisterwerk, meistardarbs Pit]"},
+                "rīksnā": set()}
+    cands = {"stīri": {"[sture MK]"}, "māisterjasdēlan": {"[Maisterwerk, meistardarbs Pit]"},
+             "māistrjasdēlan": {"[Maisterwerk, meistardarbs Pit]"}, "paprika": {"[Paprika MK]"}}
+    assert N.pair_renames(vanished, cands) == {
+        "štīri": ["stīri"], "māisteresdēlan": ["māisterjasdēlan", "māistrjasdēlan"]}
+
+
+def test_pending_records_rename_target():
+    r = _run({"štīri"}, words=["štīri"], new={"stīri"})
+    r.writes = {"entries/štīri/engl.html": page(li("štīri", desc="[sture MK]")).encode(),
+                "entries/stīri/engl.html": page(li("stīri", desc="[sture MK]")).encode()}
+    _, pending = r.resolve_deletions({}, "2026-10-28", False)
+    assert pending == {"štīri": {"since": "2026-10-28", "to": ["stīri"]}}

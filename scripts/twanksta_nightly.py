@@ -94,6 +94,33 @@ def li_signature(blocks, word):
     return tuple(sorted(li for w, li in blocks if w == word))
 
 
+SOURCE_RE = re.compile(r"\[[^\]]*\]")
+
+
+def sources(html, word):
+    """Bracketed source references ("[sture MK]") in the desc of the lemma's entries."""
+    soup = BeautifulSoup(html, "html.parser")
+    out = set()
+    for li in soup.find_all("li"):
+        w = li.find(class_="word")
+        desc = li.find(class_="desc")
+        if w and desc and w.get_text(strip=True) == word:
+            out.update(SOURCE_RE.findall(desc.get_text(" ", strip=True)))
+    return out
+
+
+def pair_renames(vanished, candidates):
+    """{old: [new, ...]} for lemmas sharing a bracketed source reference.
+
+    vanished / candidates: {lemma: set(sources)}."""
+    pairs = {}
+    for old, src in vanished.items():
+        to = sorted(n for n, nsrc in candidates.items() if src & nsrc)
+        if to:
+            pairs[old] = to
+    return pairs
+
+
 def form_keys(html, word):
     """{(numb, desc)} of the lemma's entries that have a paradigm table."""
     soup = BeautifulSoup(html, "html.parser")
@@ -158,7 +185,8 @@ class Store:
         return self._load(self.rotation_path, {"next": LANGUAGES[0], "last_verified": {}})
 
     def pending(self):
-        return self._load(self.pending_path, {})
+        raw = self._load(self.pending_path, {})
+        return {w: v if isinstance(v, dict) else {"since": v} for w, v in raw.items()}
 
     def entry_path(self, word, lang):
         return os.path.join(self.entries, safe_filename(word), f"{lang}.html")
@@ -353,6 +381,10 @@ class Run:
 
     # -- apply
 
+    def current(self, path):
+        """File content as it will be after this run."""
+        return self.writes[path] if path in self.writes else self.store.read(path)
+
     def resolve_deletions(self, pending, today, partial):
         """Lemmas empty twice in a row are deleted; empty once become pending.
 
@@ -360,7 +392,13 @@ class Run:
         if partial:
             return set(), dict(pending)
         gone = {w for w in self.empty if w in pending}
-        new_pending = {w: today for w in self.empty if w not in pending}
+        new_pending = {w: {"since": today} for w in self.empty if w not in pending}
+        vanished = {w: sources(text(self.current(self.store.entry_path(w, "engl")) or b""), w)
+                    for w in new_pending}
+        candidates = {n: sources(text(self.current(self.store.entry_path(n, "engl")) or b""), n)
+                      for n in self.new}
+        for old, to in pair_renames(vanished, candidates).items():
+            new_pending[old]["to"] = to
         # Lemmas can share a directory (safe_filename maps "ēit?" and "ēit_" alike);
         # never delete files a surviving lemma still uses.
         live = {safe_filename(w) for w in (set(self.words) | self.new) - gone}
@@ -437,16 +475,23 @@ async def main_async(args):
 
     # Language-neutral block first: the wrapper uses everything up to the first
     # blank line as the commit message. Details for the mail follow.
-    print(f"twanksta {lang} {today}  +{len(run.new)} ~{len(run.changed)} -{len(gone)}")
-    for sign, items in (("+", run.new), ("~", run.changed), ("-", gone)):
+    renamed = {w: pending[w]["to"] for w in gone if pending[w].get("to")}
+    print(f"twanksta {lang} {today}  +{len(run.new)} ~{len(run.changed)} "
+          f"-{len(gone) - len(renamed)} >{len(renamed)}")
+    for sign, items in (("+", run.new), ("~", run.changed), ("-", gone - set(renamed))):
         if items:
             print(f"{sign} " + ", ".join(sorted(items)))
+    if renamed:
+        print("> " + ", ".join(f"{o} → {' | '.join(t)}" for o, t in sorted(renamed.items())))
     print()
     print(f"{run.checked} lemmas checked, {client.requests} requests, {minutes:.0f} min")
     if lang == "engl":
         print(f"  sweep fallback single queries: {run.fallback}")
-    if set(new_pending) - set(pending):
-        print("  empty once (pending deletion): " + ", ".join(sorted(set(new_pending) - set(pending))))
+    fresh = sorted(set(new_pending) - set(pending))
+    if fresh:
+        print("  empty once (pending deletion): " + ", ".join(
+            w + (f" (→ {' | '.join(new_pending[w]['to'])})" if new_pending[w].get("to") else "")
+            for w in fresh))
     print(f"  files: {len(run.writes)} written, {len(run.deletes)} deleted")
 
     last = dict(rotation.get("last_verified", {}))
