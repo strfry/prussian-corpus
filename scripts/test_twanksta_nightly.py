@@ -128,13 +128,13 @@ class _FileStore(_Store):
 def _check(stored, live):
     import asyncio
     r = N.Run.__new__(N.Run)
-    r.store, r.client, r.lang = _FileStore(stored.encode()), _FakeClient(live.encode()), "engl"
+    r.store, r.client = _FileStore(stored.encode()), _FakeClient(live.encode())
     r.empty, r.failed, r.marked, r.redirects = set(), set(), [], {}
 
     async def mark(word, is_new):
         r.marked.append(word)
     r.mark_new_or_changed = mark
-    asyncio.run(r.check_word("si"))
+    asyncio.run(r.check_word("si", "engl"))
     return r
 
 
@@ -203,6 +203,7 @@ def _refetch_run(stored_html, live_html):
     r.store = _DictStore(files)
     r.client = _MultiClient({l: live_html.encode() for l in N.LANGUAGES})
     r.writes, r.deletes, r.failed, r.new, r.changed = {}, set(), set(), set(), set()
+    r.refetched = set()
     return r
 
 
@@ -246,3 +247,36 @@ def test_typo_rule_only_against_new_lemmas():
              new={"elektrāina"})
     gone, pending, renamed = r.resolve_deletions({}, "2026-10-28", False)
     assert renamed == {"elekrāina": ["elektrāina"]} and set(pending) == {"matiskērmens"}
+
+
+def test_lemma_is_refetched_once_per_run():
+    import asyncio
+    r = _refetch_run(page(li("si", tr="a")), page(li("si", tr="b")))
+    calls = []
+    orig = r.client.search
+
+    async def search(s, lang):
+        calls.append(lang)
+        return await orig(s, lang)
+    r.client.search = search
+    asyncio.run(r.mark_new_or_changed("si", is_new=False))
+    asyncio.run(r.mark_new_or_changed("si", is_new=False))   # seen changed again in miks
+    assert len(calls) == len(N.LANGUAGES)
+
+
+def test_sweep_runs_every_language_and_finds_new_lemmas():
+    import asyncio
+    r = _refetch_run(page(li("si")), page(li("si"), li("sēja")))
+    r.words, r.empty, r.redirects, r.langs, r.fallback = ["si"], set(), {}, list(N.LANGUAGES), 0
+    asked = set()
+    orig = r.client.search
+
+    async def search(s, lang):
+        asked.add(lang)
+        return await orig(s, lang)
+    r.client.search = search
+    r.client.throttle = type("T", (), {"stats": lambda self: ""})()
+    r.client.requests = 0
+    asyncio.run(r.run_sweep())
+    assert asked == set(N.LANGUAGES)
+    assert r.new == {"sēja"} and r.changed == set() and not r.empty

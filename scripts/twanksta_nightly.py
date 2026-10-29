@@ -2,15 +2,12 @@
 """
 Nightly incremental refresh of raw/twanksta.
 
-Each night sweeps the whole vocabulary in one language, rotating
-engl → miks → leit → latt → pols → mask: recursive prefix search over
+Each night sweeps the whole vocabulary in all 6 languages, one after another
+(engl, miks, leit, latt, pols, mask): recursive prefix search over
 /search/?s=<prefix>% (the prefix tier caps at 10 lemmas, so a prefix is split
 when it returns ≥ 10 prefix hits). Each lemma's own <li> blocks are compared with
 the stored file of that language, and new lemmas are discovered in the same pass.
-Most edits are on the Prussian side (spelling, desc, paradigm), which every
-language shows, so every night catches them and finds new lemmas; the rotation
-only matters for edits to the translations themselves. Lemmas only seen in capped
-responses get a single /search/?s=<lemma> query.
+Lemmas only seen in capped responses get a single /search/?s=<lemma> query.
 
 A lemma that is new or changed in any language gets all 6 languages and its form
 tables (/more/) refetched. Form tables are never refreshed on their own: they are
@@ -29,11 +26,11 @@ script exits non-zero and leaves raw/twanksta untouched. Summary goes to stdout,
 progress to stderr.
 
 Usage:
-  python3 scripts/twanksta_nightly.py                 # run the due language
-  python3 scripts/twanksta_nightly.py --lang miks     # force a language (does not advance rotation)
+  python3 scripts/twanksta_nightly.py                 # sweep all languages
+  python3 scripts/twanksta_nightly.py --lang miks     # sweep one language only (testing)
   python3 scripts/twanksta_nightly.py --sweep-root ab # sweep below one prefix only (testing)
   python3 scripts/twanksta_nightly.py --dry-run       # check, but write nothing
-  python3 scripts/twanksta_nightly.py --status        # show rotation state
+  python3 scripts/twanksta_nightly.py --status        # show state
 """
 
 import argparse
@@ -59,7 +56,6 @@ DELAY = 0.2
 CONCURRENCY = 3
 PREFIX_CAP = 10          # /search/ returns at most 10 prefix-tier lemmas
 MAX_PREFIX_LEN = 24
-STALE_DAYS = 8
 MAX_EMPTY_RATIO = 0.02   # more empty answers for known lemmas than this ⇒ abort
 MAX_ERROR_RATIO = 0.01
 
@@ -184,7 +180,6 @@ class Store:
         self.forms = os.path.join(raw, "forms")
         self.state_dir = os.path.join(raw, "state")
         self.wordlist_path = os.path.join(self.state_dir, "wordlist.json")
-        self.rotation_path = os.path.join(self.state_dir, "rotation.json")
         self.pending_path = os.path.join(self.state_dir, "pending_deletions.json")
 
     def _load(self, path, default):
@@ -198,9 +193,6 @@ class Store:
         if words is None:   # bootstrap from the corpus wordlist of the old scraper
             words = [e["word"] for e in self._load(CORPUS_WORDLIST, [])]
         return sorted(set(words))
-
-    def rotation(self):
-        return self._load(self.rotation_path, {"next": LANGUAGES[0], "last_verified": {}})
 
     def pending(self):
         raw = self._load(self.pending_path, {})
@@ -275,16 +267,18 @@ def text(content):
 # ------------------------------------------------------------------- the run
 
 class Run:
-    def __init__(self, store, client, lang):
+    def __init__(self, store, client, langs=LANGUAGES):
         self.store = store
         self.client = client
-        self.lang = lang
+        self.langs = list(langs)
         self.words = store.wordlist()
         self.writes = {}        # path -> bytes
         self.deletes = set()    # paths
         self.new, self.changed, self.empty = set(), set(), set()
         self.redirects = {}     # vanished lemma -> lemmas the site returns for it
         self.failed = set()     # lemmas whose check could not be completed
+        self.refetched = set()  # lemmas already refetched in all languages this run
+        self.fallback = 0
 
     # -- refetch everything for one lemma
 
@@ -329,6 +323,9 @@ class Run:
         return touched
 
     async def mark_new_or_changed(self, word, is_new):
+        if word in self.refetched:
+            return
+        self.refetched.add(word)
         if is_new:
             self.new.add(word)
             await self.refetch_lemma(word)
@@ -338,8 +335,8 @@ class Run:
 
     # -- single-lemma check (sweep fallback)
 
-    async def check_word(self, word):
-        content = await self.client.search(word, self.lang)
+    async def check_word(self, word, lang):
+        content = await self.client.search(word, lang)
         if content is None:
             self.failed.add(word)
             return
@@ -352,16 +349,16 @@ class Run:
             return
         # Compare only the lemma's own <li> blocks: the rest of the response lists
         # other lemmas that merely match the query and changes whenever they do.
-        stored = self.store.read(self.store.entry_path(word, self.lang))
+        stored = self.store.read(self.store.entry_path(word, lang))
         if stored is None or li_signature(li_blocks(text(stored)), word) != sig:
             await self.mark_new_or_changed(word, is_new=False)
 
     # -- sweep
 
-    async def sweep(self, prefix, follow, seen, complete_sigs):
-        content = await self.client.search(prefix + "%", self.lang)
+    async def sweep(self, lang, prefix, follow, seen, complete_sigs, failed):
+        content = await self.client.search(prefix + "%", lang)
         if content is None:
-            self.sweep_failed.add(prefix)
+            failed.add(prefix)
             return
         blocks = li_blocks(text(content))
         for w, _ in blocks:
@@ -374,36 +371,40 @@ class Run:
                 complete_sigs[w] = li_signature(blocks, w)
             return
         kids = sorted(follow.get(prefix[-1] if prefix else "", set()))
-        await asyncio.gather(*[self.sweep(prefix + c, follow, seen, complete_sigs) for c in kids])
+        await asyncio.gather(*[self.sweep(lang, prefix + c, follow, seen, complete_sigs, failed)
+                               for c in kids])
 
     async def run_sweep(self, root=None):
         follow = follow_chars(self.words)
-        seen, sigs = set(), {}
-        self.sweep_failed = set()
         roots = [root] if root else sorted(follow[""])
-        for r in roots:
-            await self.sweep(r, follow, seen, sigs)
-            print(f"  [sweep] {r}: {len(sigs)} lemmas verified, {self.client.requests} requests "
-                  f"({self.client.throttle.stats()})", file=sys.stderr, flush=True)
-        if self.sweep_failed:
-            self.failed |= {f"<prefix {p}>" for p in self.sweep_failed}
-
-        known = set(self.words)
         scope = [w for w in self.words if not root or norm(w).startswith(root)]
         self.checked = len(scope)
+        for lang in self.langs:
+            await self.sweep_lang(lang, roots, follow, scope)
+
+    async def sweep_lang(self, lang, roots, follow, scope):
+        seen, sigs, failed = set(), {}, set()
+        for r in roots:
+            await self.sweep(lang, r, follow, seen, sigs, failed)
+            print(f"  [{lang}] {r}: {len(sigs)} lemmas verified, {self.client.requests} requests "
+                  f"({self.client.throttle.stats()})", file=sys.stderr, flush=True)
+        self.failed |= {f"<{lang} prefix {p}>" for p in failed}
+
         tasks = []
-        for w in sorted(seen - known):
+        for w in sorted(seen - set(self.words) - self.new):
             tasks.append(self.mark_new_or_changed(w, is_new=True))
         fallback = []
         for w in scope:
+            if w in self.refetched or w in self.empty:
+                continue        # already current, or already known to be gone
             if w in sigs:
-                stored = self.store.read(self.store.entry_path(w, self.lang))
+                stored = self.store.read(self.store.entry_path(w, lang))
                 if stored is None or li_signature(li_blocks(text(stored)), w) != sigs[w]:
                     tasks.append(self.mark_new_or_changed(w, is_new=False))
             else:
                 fallback.append(w)   # only seen in capped responses, or not at all
-        self.fallback = len(fallback)
-        tasks += [self.check_word(w) for w in fallback]
+        self.fallback += len(fallback)
+        tasks += [self.check_word(w, lang) for w in fallback]
         for i in range(0, len(tasks), 200):
             await asyncio.gather(*tasks[i:i + 200])
 
@@ -482,19 +483,17 @@ def sync_corpus_wordlist(words):
 
 async def main_async(args):
     store = Store(args.raw)
-    rotation = store.rotation()
-    lang = args.lang or rotation["next"]
     today = datetime.date.today().isoformat()
     t0 = time.monotonic()
 
     client = Client()
-    run = Run(store, client, lang)
+    run = Run(store, client, [args.lang] if args.lang else LANGUAGES)
     try:
         await run.run_sweep(args.sweep_root)
     finally:
         await client.close()
 
-    partial = bool(args.sweep_root)
+    partial = bool(args.sweep_root or args.lang)
     pending = store.pending()
     gone, new_pending, renamed = run.resolve_deletions(pending, today, partial)
 
@@ -515,7 +514,7 @@ async def main_async(args):
     # blank line as the commit message. Details for the mail follow.
     targets = {t for to in renamed.values() for t in to}
     added = run.new - targets
-    print(f"twanksta {lang} {today}  +{len(added)} ~{len(run.changed)} "
+    print(f"twanksta {today}  +{len(added)} ~{len(run.changed)} "
           f"-{len(gone) - len(renamed)} >{len(renamed)}")
     for sign, items in (("+", added), ("~", run.changed), ("-", gone - set(renamed))):
         if items:
@@ -529,14 +528,6 @@ async def main_async(args):
     if fresh:
         print("  empty once (pending deletion): " + ", ".join(fresh))
     print(f"  files: {len(run.writes)} written, {len(run.deletes)} deleted")
-
-    last = dict(rotation.get("last_verified", {}))
-    if not partial:
-        last[lang] = today
-    for l in LANGUAGES:
-        d = last.get(l)
-        if not d or (datetime.date.today() - datetime.date.fromisoformat(d)).days > STALE_DAYS:
-            print(f"  WARNING: {l} last fully verified {d or 'never'}")
 
     if problems:
         print("ABORTED, nothing written:")
@@ -557,10 +548,6 @@ async def main_async(args):
                 os.rmdir(d)
     write_atomic(store.wordlist_path, dump_json(words))
     write_atomic(store.pending_path, dump_json(new_pending))
-    if not args.lang and not partial:
-        rotation["next"] = LANGUAGES[(LANGUAGES.index(lang) + 1) % len(LANGUAGES)]
-    rotation["last_verified"] = last
-    write_atomic(store.rotation_path, dump_json(rotation))
     if os.path.realpath(args.raw) == os.path.realpath(DEFAULT_RAW):
         sync_corpus_wordlist(words)
     return 0
@@ -568,12 +555,8 @@ async def main_async(args):
 
 def show_status(raw):
     store = Store(raw)
-    rot = store.rotation()
     print(f"raw dir:   {raw}")
     print(f"lemmas:    {len(store.wordlist())}")
-    print(f"next lang: {rot['next']}")
-    for l in LANGUAGES:
-        print(f"  {l}: last verified {rot.get('last_verified', {}).get(l, 'never')}")
     print(f"pending deletions: {len(store.pending())}")
 
 

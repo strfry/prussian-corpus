@@ -21,12 +21,11 @@ Gespeichert:
 Nächtlicher Abgleich (`twanksta_nightly.py`, Cron-Wrapper `twanksta_nightly.sh`):
 `raw/twanksta` ist ein Symlink auf `../../wirdeins/twanksta` im Daten-Repo
 [wirdeins](https://github.com/strfry/wirdeins). Jede Nacht läuft ein
-Präfix-Sweep über den ganzen Wortschatz in einer Sprache (Rotation engl → miks → leit →
-latt → pols → mask). Änderungen auf der prußischen Seite und neue Lemmata fallen so
-jede Nacht auf, die Rotation betrifft nur Änderungen an den Übersetzungen selbst. Geänderte oder
+Präfix-Sweep über den ganzen Wortschatz in allen 6 Sprachen nacheinander, der auch
+neue Lemmata findet. Geänderte oder
 neue Lemmata werden in allen Sprachen samt Formtabelle neu geholt, das Ergebnis wird
 committet. `git log -p` im Daten-Repo ist damit das Änderungsprotokoll. Zustand
-(Wortliste, Rotation, Löschkandidaten) liegt in `raw/twanksta/state/`.
+(Wortliste, Löschkandidaten) liegt in `raw/twanksta/state/`.
 
 Verhalten der Seite, auf dem das beruht (gemessen 2026-10-28): Antworten sind
 byte-deterministisch; `%`/`_` werden als SQL-LIKE durchgereicht; die Präfix-Stufe
