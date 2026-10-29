@@ -2,26 +2,27 @@
 """
 Nightly incremental refresh of raw/twanksta.
 
-Each night checks the whole vocabulary in exactly one language, rotating
-engl → miks → leit → latt → pols → mask:
-
-  engl night:  recursive prefix sweep over /search/?s=<prefix>% (the prefix tier
-               caps at 10 lemmas, so a prefix is split when it returns ≥ 10 prefix
-               hits). Compares each lemma's <li> blocks with the stored engl.html
-               and discovers new lemmas in the same pass.
-  other nights: one /search/?s=<lemma> per lemma, byte-compared with the stored file.
+Each night sweeps the whole vocabulary in one language, rotating
+engl → miks → leit → latt → pols → mask: recursive prefix search over
+/search/?s=<prefix>% (the prefix tier caps at 10 lemmas, so a prefix is split
+when it returns ≥ 10 prefix hits). Each lemma's own <li> blocks are compared with
+the stored file of that language, and new lemmas are discovered in the same pass.
+Most edits are on the Prussian side (spelling, desc, paradigm), which every
+language shows, so every night catches them and finds new lemmas; the rotation
+only matters for edits to the translations themselves. Lemmas only seen in capped
+responses get a single /search/?s=<lemma> query.
 
 A lemma that is new or changed in any language gets all 6 languages and its form
 tables (/more/) refetched. Form tables are never refreshed on their own: they are
 generated from stems and cannot be edited on the site.
 
 Site behaviour this relies on (measured 2026-10-28):
-  - responses are byte-deterministic, so stored files are compared byte for byte;
+  - responses are byte-deterministic;
   - a lemma's <li> in a <prefix>% response is identical to the one in its own
     response (descripcio articles included);
   - % and _ are passed through as SQL LIKE, matching is case- and diacritic-insensitive;
   - single-lemma queries return (almost) only the lemma itself, so new lemmas can
-    only be found by the sweep.
+    only be found by the sweep (which also lets renames pair up the same night).
 
 Nothing is written until the run has passed its sanity checks; on failure the
 script exits non-zero and leaves raw/twanksta untouched. Summary goes to stdout,
@@ -30,8 +31,7 @@ progress to stderr.
 Usage:
   python3 scripts/twanksta_nightly.py                 # run the due language
   python3 scripts/twanksta_nightly.py --lang miks     # force a language (does not advance rotation)
-  python3 scripts/twanksta_nightly.py --limit 50      # only the first N lemmas (testing; non-engl)
-  python3 scripts/twanksta_nightly.py --sweep-root ab # engl sweep below one prefix only (testing)
+  python3 scripts/twanksta_nightly.py --sweep-root ab # sweep below one prefix only (testing)
   python3 scripts/twanksta_nightly.py --dry-run       # check, but write nothing
   python3 scripts/twanksta_nightly.py --status        # show rotation state
 """
@@ -336,7 +336,7 @@ class Run:
             # only count changes the refetch confirms (guards against odd one-off answers)
             self.changed.add(word)
 
-    # -- non-engl night
+    # -- single-lemma check (sweep fallback)
 
     async def check_word(self, word):
         content = await self.client.search(word, self.lang)
@@ -356,19 +356,10 @@ class Run:
         if stored is None or li_signature(li_blocks(text(stored)), word) != sig:
             await self.mark_new_or_changed(word, is_new=False)
 
-    async def run_lang(self, limit=None):
-        words = self.words[:limit] if limit else self.words
-        self.checked = len(words)
-        batch = 200
-        for i in range(0, len(words), batch):
-            await asyncio.gather(*[self.check_word(w) for w in words[i:i + batch]])
-            print(f"  [{self.lang}] {min(i + batch, len(words))}/{len(words)} "
-                  f"({self.client.throttle.stats()})", file=sys.stderr, flush=True)
-
-    # -- engl night
+    # -- sweep
 
     async def sweep(self, prefix, follow, seen, complete_sigs):
-        content = await self.client.search(prefix + "%", "engl")
+        content = await self.client.search(prefix + "%", self.lang)
         if content is None:
             self.sweep_failed.add(prefix)
             return
@@ -385,7 +376,7 @@ class Run:
         kids = sorted(follow.get(prefix[-1] if prefix else "", set()))
         await asyncio.gather(*[self.sweep(prefix + c, follow, seen, complete_sigs) for c in kids])
 
-    async def run_engl(self, root=None):
+    async def run_sweep(self, root=None):
         follow = follow_chars(self.words)
         seen, sigs = set(), {}
         self.sweep_failed = set()
@@ -406,7 +397,7 @@ class Run:
         fallback = []
         for w in scope:
             if w in sigs:
-                stored = self.store.read(self.store.entry_path(w, "engl"))
+                stored = self.store.read(self.store.entry_path(w, self.lang))
                 if stored is None or li_signature(li_blocks(text(stored)), w) != sigs[w]:
                     tasks.append(self.mark_new_or_changed(w, is_new=False))
             else:
@@ -499,14 +490,11 @@ async def main_async(args):
     client = Client()
     run = Run(store, client, lang)
     try:
-        if lang == "engl":
-            await run.run_engl(args.sweep_root)
-        else:
-            await run.run_lang(args.limit)
+        await run.run_sweep(args.sweep_root)
     finally:
         await client.close()
 
-    partial = bool(args.limit or args.sweep_root)
+    partial = bool(args.sweep_root)
     pending = store.pending()
     gone, new_pending, renamed = run.resolve_deletions(pending, today, partial)
 
@@ -536,8 +524,7 @@ async def main_async(args):
         print("> " + ", ".join(f"{o} → {' | '.join(t)}" for o, t in sorted(renamed.items())))
     print()
     print(f"{run.checked} lemmas checked, {client.requests} requests, {minutes:.0f} min")
-    if lang == "engl":
-        print(f"  sweep fallback single queries: {run.fallback}")
+    print(f"  sweep fallback single queries: {run.fallback}")
     fresh = sorted(set(new_pending) - set(pending))
     if fresh:
         print("  empty once (pending deletion): " + ", ".join(fresh))
@@ -594,7 +581,6 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[1])
     ap.add_argument("--raw", default=DEFAULT_RAW)
     ap.add_argument("--lang", choices=LANGUAGES)
-    ap.add_argument("--limit", type=int)
     ap.add_argument("--sweep-root")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--status", action="store_true")
