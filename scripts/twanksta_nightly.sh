@@ -14,8 +14,10 @@
 # which corpus/fst revisions produced them, since a code change alone also
 # changes them. A failed conversion keeps the previous files and is reported.
 # The compressor works entry by entry but its memory grows with the input
-# (~0.2 MB/entry, over Uberspace's 1.5 GB), so it runs on chunks of 1000
-# entries; the concatenated result is byte-identical to a single run.
+# (~1.3 GB in one go), so it runs on chunks of 1000 entries; the concatenated
+# result is byte-identical to a single run. Even a chunk peaks at ~400-560 MB,
+# more than the Uberspace has left next to flexsrv/Lexonomy, so lean.nvh is
+# only built with TWANKSTA_LEAN=1.
 #
 # crontab:  17 3 * * *  /path/to/corpus/scripts/twanksta_nightly.sh
 # Extra arguments are passed to twanksta_nightly.py (for testing).
@@ -72,7 +74,9 @@ else
     rm -f nvh/full.nvh.new
     echo "WARNING: NVH conversion failed, nvh/ left as it was (see $RUNDIR/twanksta_nightly.log)"
 fi
-if [ ! -d "$FST/gen" ]; then
+if [ -z "${TWANKSTA_LEAN:-}" ]; then
+    :
+elif [ ! -d "$FST/gen" ]; then
     echo "WARNING: no fst checkout at $FST, nvh/lean.nvh not updated"
 elif compress_chunked nvh/full.nvh nvh/lean.nvh.new 2>>"$RUNDIR/twanksta_nightly.log"; then
     mv nvh/lean.nvh.new nvh/lean.nvh

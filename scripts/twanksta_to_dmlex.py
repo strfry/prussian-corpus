@@ -557,6 +557,9 @@ def build_entries(words=None):
 
     words: optionale Teilmenge von Suchwörtern (für schnelle Tests)."""
     wordlist = json.load(open(tp.WORDLIST, encoding="utf-8"))
+    # raw/twanksta/state/wordlist.json (nächtlicher Abgleich) ist eine sortierte
+    # Liste von Strings; die Corpus-Wortliste Dicts mit "word"
+    wordlist = [w if isinstance(w, dict) else {"word": w} for w in wordlist]
     if words is not None:
         wset = set(words)
         wordlist = [w for w in wordlist if w["word"] in wset]
@@ -836,7 +839,8 @@ def _paradigm_sort_key(par: str):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="raw twanksta HTML → fette NVH")
-    ap.add_argument("--raw", help="raw/twanksta-Verzeichnis (Default: corpus/raw/twanksta)")
+    ap.add_argument("--raw", help="raw/twanksta-Verzeichnis samt state/wordlist.json "
+                    "(Default: corpus/raw/twanksta mit state/twanksta_wordlist.json)")
     ap.add_argument("--out", default=OUT_FILE)
     ap.add_argument("--no-save-ids", action="store_true",
                     help="eingefrorene IDs nur lesen, nicht fortschreiben (ids/ bleibt unverändert)")
@@ -844,6 +848,7 @@ if __name__ == "__main__":
     if args.raw:
         tp.ENTRIES_DIR = os.path.join(args.raw, "entries")
         tp.FORMS_DIR = os.path.join(args.raw, "forms")
+        tp.WORDLIST = os.path.join(args.raw, "state", "wordlist.json")
     OUT_FILE = args.out
     out, stats = convert()
     if not args.no_save_ids:

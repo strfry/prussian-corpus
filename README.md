@@ -29,7 +29,8 @@ committet. `git log -p` im Daten-Repo ist damit das Änderungsprotokoll. Zustand
 Im selben Commit landen die Rohdaten auch als NVH: `raw/twanksta/nvh/full.nvh`
 (`twanksta_to_dmlex.py`, jede belegte Form) und `raw/twanksta/nvh/lean.nvh`
 (fst-Kompressor, nur was die Grammatik nicht selbst erzeugt; braucht den
-fst-Checkout mit gebauten Atomen). `state/nvh.json` nennt die corpus-/fst-Stände,
+fst-Checkout mit gebauten Atomen und gut 500 MB Speicher, deshalb nur mit
+`TWANKSTA_LEAN=1`). `state/nvh.json` nennt die corpus-/fst-Stände,
 aus denen beide stammen, denn auch eine Codeänderung allein verändert sie.
 
 Verhalten der Seite, auf dem das beruht (gemessen 2026-10-28): Antworten sind
