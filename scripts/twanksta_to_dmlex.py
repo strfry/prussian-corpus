@@ -31,10 +31,13 @@ name: value, 2-Space-Einrückung. Mehrzeilige/HTML-Legacy-Werte werden reversibe
 einzeilig kodiert (\\n, \\\\), Kanonisierung siehe encode_val/decode_val.
 
   python3 scripts/twanksta_to_dmlex.py     # schreibt die fette NVH + Statistik
+  python3 scripts/twanksta_to_dmlex.py --raw DIR --out FILE --no-save-ids
+                                           # nächtlicher Lauf (twanksta_nightly.sh)
 """
 
 from __future__ import annotations
 
+import argparse
 import collections
 import json
 import os
@@ -832,11 +835,24 @@ def _paradigm_sort_key(par: str):
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="raw twanksta HTML → fette NVH")
+    ap.add_argument("--raw", help="raw/twanksta-Verzeichnis (Default: corpus/raw/twanksta)")
+    ap.add_argument("--out", default=OUT_FILE)
+    ap.add_argument("--no-save-ids", action="store_true",
+                    help="eingefrorene IDs nur lesen, nicht fortschreiben (ids/ bleibt unverändert)")
+    args = ap.parse_args()
+    if args.raw:
+        tp.ENTRIES_DIR = os.path.join(args.raw, "entries")
+        tp.FORMS_DIR = os.path.join(args.raw, "forms")
+    OUT_FILE = args.out
     out, stats = convert()
-    save_id_map(out)   # K4: IDs einfrieren (append-only) nach dem Vollauf
+    if not args.no_save_ids:
+        save_id_map(out)   # K4: IDs einfrieren (append-only) nach dem Vollauf
     lines = nvh_lines(out)
-    with open(OUT_FILE, "w", encoding="utf-8") as f:
+    tmp = OUT_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
+    os.replace(tmp, OUT_FILE)
     print(f"source entries: {len(out)}", file=sys.stderr)
     print(f"  translated: {stats['translated']} (with ref→relation: {stats['trans_with_ref']})",
           file=sys.stderr)

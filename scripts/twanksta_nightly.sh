@@ -7,6 +7,13 @@
 # and changed something; rebases onto and pushes to the remote if there is one.
 # Everything goes to stdout so cron's MAILTO delivers it.
 #
+# After the scrape the raw HTML is converted to NVH in the same commit:
+# nvh/full.nvh (scripts/twanksta_to_dmlex.py, every attested form) and
+# nvh/lean.nvh (fst gen/compress_forms.py, only what the grammar does not
+# generate; needs the fst checkout with built atoms). state/nvh.json records
+# which corpus/fst revisions produced them, since a code change alone also
+# changes them. A failed conversion keeps the previous files and is reported.
+#
 # crontab:  17 3 * * *  /path/to/corpus/scripts/twanksta_nightly.sh
 # Extra arguments are passed to twanksta_nightly.py (for testing).
 set -euo pipefail
@@ -15,6 +22,7 @@ CORPUS="$(cd "$(dirname "$0")/.." && pwd)"
 RAW="${TWANKSTA_RAW:-$CORPUS/raw/twanksta}"
 PYTHON="${PYTHON:-$CORPUS/.venv/bin/python}"
 [ -x "$PYTHON" ] || PYTHON=python3
+FST="${TWANKSTA_FST:-$CORPUS/../fst}"
 RUNDIR="$CORPUS/state"   # lock + stderr log, outside the data repo
 mkdir -p "$RUNDIR"
 
@@ -40,6 +48,28 @@ summary="$("$PYTHON" "$CORPUS/scripts/twanksta_nightly.py" --raw "$RAW" "$@" 2>"
     exit $status
 }
 echo "$summary"
+
+rev() { git -C "$1" describe --always --dirty --abbrev=7 2>/dev/null || echo unknown; }
+mkdir -p nvh
+if "$PYTHON" "$CORPUS/scripts/twanksta_to_dmlex.py" --raw "$RAW" --out nvh/full.nvh.new \
+        --no-save-ids >/dev/null 2>>"$RUNDIR/twanksta_nightly.log"; then
+    mv nvh/full.nvh.new nvh/full.nvh
+else
+    rm -f nvh/full.nvh.new
+    echo "WARNING: NVH conversion failed, nvh/ left as it was (see $RUNDIR/twanksta_nightly.log)"
+fi
+if [ ! -d "$FST/gen" ]; then
+    echo "WARNING: no fst checkout at $FST, nvh/lean.nvh not updated"
+elif (cd "$FST" && uv run --frozen python gen/compress_forms.py --in "$RAW/nvh/full.nvh" \
+        --out "$RAW/nvh/lean.nvh.new" --no-stats) >/dev/null 2>>"$RUNDIR/twanksta_nightly.log"; then
+    mv nvh/lean.nvh.new nvh/lean.nvh
+else
+    rm -f nvh/lean.nvh.new
+    echo "WARNING: NVH compression failed, nvh/lean.nvh left as it was (see $RUNDIR/twanksta_nightly.log)"
+fi
+if [ -n "$(git status --porcelain -- nvh)" ]; then
+    printf '{\n "corpus": "%s",\n "fst": "%s"\n}\n' "$(rev "$CORPUS")" "$(rev "$FST")" > state/nvh.json
+fi
 
 git add -A -- .
 if git diff --cached --quiet -- .; then
