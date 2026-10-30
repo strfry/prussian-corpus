@@ -13,6 +13,9 @@
 # generate; needs the fst checkout with built atoms). state/nvh.json records
 # which corpus/fst revisions produced them, since a code change alone also
 # changes them. A failed conversion keeps the previous files and is reported.
+# The compressor works entry by entry but its memory grows with the input
+# (~0.2 MB/entry, over Uberspace's 1.5 GB), so it runs on chunks of 1000
+# entries; the concatenated result is byte-identical to a single run.
 #
 # crontab:  17 3 * * *  /path/to/corpus/scripts/twanksta_nightly.sh
 # Extra arguments are passed to twanksta_nightly.py (for testing).
@@ -49,6 +52,17 @@ summary="$("$PYTHON" "$CORPUS/scripts/twanksta_nightly.py" --raw "$RAW" "$@" 2>"
 }
 echo "$summary"
 
+compress_chunked() {   # in out
+    local tmp f
+    tmp="$(mktemp -d)"
+    awk -v n=1000 -v d="$tmp" '/^[^ ]/ { if (c++ % n == 0) f++ } { print > sprintf("%s/%04d.nvh", d, f) }' "$1"
+    for f in "$tmp"/*.nvh; do
+        (cd "$FST" && uv run --frozen python gen/compress_forms.py --in "$f" --out "$f.lean" \
+            --no-stats --review-out "$tmp/review.tsv") >/dev/null || { rm -rf "$tmp"; return 1; }
+    done
+    cat "$tmp"/*.nvh.lean > "$2"
+    rm -rf "$tmp"
+}
 rev() { git -C "$1" describe --always --dirty --abbrev=7 2>/dev/null || echo unknown; }
 mkdir -p nvh
 if "$PYTHON" "$CORPUS/scripts/twanksta_to_dmlex.py" --raw "$RAW" --out nvh/full.nvh.new \
@@ -60,8 +74,7 @@ else
 fi
 if [ ! -d "$FST/gen" ]; then
     echo "WARNING: no fst checkout at $FST, nvh/lean.nvh not updated"
-elif (cd "$FST" && uv run --frozen python gen/compress_forms.py --in "$RAW/nvh/full.nvh" \
-        --out "$RAW/nvh/lean.nvh.new" --no-stats) >/dev/null 2>>"$RUNDIR/twanksta_nightly.log"; then
+elif compress_chunked nvh/full.nvh nvh/lean.nvh.new 2>>"$RUNDIR/twanksta_nightly.log"; then
     mv nvh/lean.nvh.new nvh/lean.nvh
 else
     rm -f nvh/lean.nvh.new
