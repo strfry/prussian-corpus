@@ -26,6 +26,11 @@ neue Lemmata findet. Geänderte oder
 neue Lemmata werden in allen Sprachen samt Formtabelle neu geholt, das Ergebnis wird
 committet. `git log -p` im Daten-Repo ist damit das Änderungsprotokoll. Zustand
 (Wortliste, Löschkandidaten) liegt in `raw/twanksta/state/`.
+Im selben Commit landen die Rohdaten auch als NVH: `raw/twanksta/nvh/full.nvh`
+(`twanksta_to_dmlex.py`, jede belegte Form) und `raw/twanksta/nvh/lean.nvh`
+(fst-Kompressor, nur was die Grammatik nicht selbst erzeugt; braucht den
+fst-Checkout mit gebauten Atomen). `state/nvh.json` nennt die corpus-/fst-Stände,
+aus denen beide stammen, denn auch eine Codeänderung allein verändert sie.
 
 Verhalten der Seite, auf dem das beruht (gemessen 2026-10-28): Antworten sind
 byte-deterministisch; `%`/`_` werden als SQL-LIKE durchgereicht; die Präfix-Stufe
