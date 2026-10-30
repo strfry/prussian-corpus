@@ -280,3 +280,26 @@ def test_sweep_runs_every_language_and_finds_new_lemmas():
     asyncio.run(r.run_sweep())
     assert asked == set(N.LANGUAGES)
     assert r.new == {"sēja"} and r.changed == set() and not r.empty
+
+
+def test_translations_ignore_numbers_and_other_lemmas():
+    html = page(li("pōstiljōns", tr="postman"), li("pōstiniks", tr="postman, letter carrier"))
+    assert N.translations(html, "pōstiljōns") == frozenset({"postman"})
+
+
+def test_same_translations_unique_only():
+    pm = frozenset({"postman", "mailman"})
+    assert N.same_translations(pm, {"peisāliwezis": pm, "paprika": frozenset({"paprika"})}) \
+        == "peisāliwezis"
+    assert N.same_translations(pm, {"a": pm, "b": pm}) is None
+    assert N.same_translations(frozenset(), {"a": frozenset()}) is None
+
+
+def test_rename_by_same_translations():
+    r = _run({"pōstiljōns"}, words=["pōstiljōns"], new={"peisāliwezis", "paprika"})
+    r.writes = {
+        "entries/pōstiljōns/engl.html": page(li("pōstiljōns", desc="[Postilion MK]", tr="postman")).encode(),
+        "entries/peisāliwezis/engl.html": page(li("peisāliwezis", desc="[peisāli]", tr="postman")).encode(),
+        "entries/paprika/engl.html": page(li("paprika", tr="paprika")).encode()}
+    gone, pending, renamed = r.resolve_deletions({}, "2026-10-30", False)
+    assert renamed == {"pōstiljōns": ["peisāliwezis"]} and not pending

@@ -105,6 +105,29 @@ def sources(html, word):
     return out
 
 
+def translations(html, word):
+    """The lemma's translations as a frozenset ("1 postman 2 mailman" → {postman, mailman})."""
+    soup = BeautifulSoup(html, "html.parser")
+    out = set()
+    for li in soup.find_all("li"):
+        w = li.find(class_="word")
+        if not (w and w.get_text(strip=True) == word):
+            continue
+        for t in li.find_all(class_="translation-child"):
+            for n in t.find_all(class_="translation-number"):
+                n.extract()
+            out.add(" ".join(t.get_text(" ").split()).lower())
+    return frozenset(out)
+
+
+def same_translations(old, candidates):
+    """The one candidate with exactly old's (non-empty) translations, else None.
+
+    old: frozenset, candidates: {lemma: frozenset}."""
+    hits = [n for n, tr in candidates.items() if old and tr == old]
+    return hits[0] if len(hits) == 1 else None
+
+
 def pair_renames(vanished, candidates):
     """{old: [new, ...]} for lemmas sharing a bracketed source reference.
 
@@ -381,6 +404,10 @@ class Run:
         self.checked = len(scope)
         for lang in self.langs:
             await self.sweep_lang(lang, roots, follow, scope)
+        # a lemma the site names as sole answer to a vanished spelling must be stored too
+        targets = {h[0] for h in self.redirects.values() if len(h) == 1}
+        await asyncio.gather(*[self.mark_new_or_changed(t, is_new=True)
+                               for t in sorted(targets - set(self.words) - self.new)])
 
     async def sweep_lang(self, lang, roots, follow, scope):
         seen, sigs, failed = set(), {}, set()
@@ -421,7 +448,8 @@ class Run:
         at once, so git sees the files move, if it shares a bracketed source
         reference with a lemma found new in the same run, if the site answers
         the old spelling with exactly one other lemma, or if exactly one new lemma
-        is a typo's distance away. Any other lemma is deleted only after coming back empty twice
+        is a typo's distance away, or if exactly one new lemma has the same
+        English translations. Any other lemma is deleted only after coming back empty twice
         in a row. Partial (test) runs never delete and leave the pending list alone."""
         if partial:
             return set(), dict(pending), {}
@@ -439,6 +467,14 @@ class Run:
             fix = typo_fix(w, self.new)
             if fix:
                 renamed[w] = [fix]     # corrected typo (elekrāina → elektrāina)
+        claimed = {t for to in renamed.values() for t in to}
+        new_tr = {n: translations(text(self.current(self.store.entry_path(n, "engl")) or b""), n)
+                  for n in self.new - claimed}
+        for w in fresh - set(renamed):
+            old_tr = translations(text(self.current(self.store.entry_path(w, "engl")) or b""), w)
+            to = same_translations(old_tr, new_tr)
+            if to:
+                renamed[w] = [to]      # replaced word, same meaning (pōstiljōns → peisāliwezis)
         gone = {w for w in self.empty if w in pending} | set(renamed)
         new_pending = {w: {"since": today} for w in fresh - set(renamed)}
         # Lemmas can share a directory (safe_filename maps "ēit?" and "ēit_" alike);
